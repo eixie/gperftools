@@ -285,6 +285,14 @@ class PERFTOOLS_DLL_DECL PageHeap {
 
   // Index of last free list where we released memory to the OS.
   int release_index_;
+
+  struct largealloc {
+    Length length;
+    unsigned satisfied;
+  };
+  static const int largealloc_cbuf_size = 100;
+  struct largealloc largealloc_cbuf[largealloc_cbuf_size];
+  unsigned int largealloc_cbuf_index;
 };
 
 }  // namespace tcmalloc

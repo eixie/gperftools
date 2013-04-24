@@ -42,6 +42,8 @@
 #include "static_vars.h"       // for Static
 #include "system-alloc.h"      // for TCMalloc_SystemAlloc, etc
 
+#include <time.h>
+
 DEFINE_double(tcmalloc_release_rate,
               EnvToDouble("TCMALLOC_RELEASE_RATE", 1.0),
               "Rate at which we release unused memory to the system.  "
@@ -57,7 +59,8 @@ PageHeap::PageHeap()
       pagemap_cache_(0),
       scavenge_counter_(0),
       // Start scavenging at kMaxPages list
-      release_index_(kMaxPages) {
+      release_index_(kMaxPages),
+      largealloc_cbuf_index(0) {
   COMPILE_ASSERT(kNumClasses <= (1 << PageMapCache::kValuebits), valuebits);
   DLL_Init(&large_.normal);
   DLL_Init(&large_.returned);
@@ -139,11 +142,34 @@ Span* PageHeap::AllocLarge(Length n) {
     }
   }
 
+  largealloc_cbuf[largealloc_cbuf_index].length = n;
+  largealloc_cbuf[largealloc_cbuf_index].satisfied = best != NULL;
+  largealloc_cbuf_index++;
+  if (largealloc_cbuf_index == 100) { largealloc_cbuf_index = 0; }
+
   return best == NULL ? NULL : Carve(best, n);
 }
 
 void PageHeap::PrintLargeAllocStats() {
-  fprintf(stderr, "Free list contents:\n");
+  fprintf(stderr, "[tcmalloc] %u Printing large allocation stats (in # of %lu byte pages).\n", time(NULL), kPageSize);
+  fprintf(stderr, "[tcmalloc] Last %d allocations: [", largealloc_cbuf_size);
+
+  for(int i = 0; i < largealloc_cbuf_size; i++) {
+    struct largealloc alloc = largealloc_cbuf[i];
+
+    fprintf(stderr, "%lu/", alloc.length);
+    if (alloc.satisfied) {
+      fprintf(stderr, "satisfied");
+    } else {
+      fprintf(stderr, "unsatisfied");
+    }
+
+    if (i < (largealloc_cbuf_size - 1)) { fprintf(stderr, ", "); }
+  }
+
+  fprintf(stderr, "]\n\n");
+
+  fprintf(stderr, "[tcmalloc] Free list contents:\n");
 
   for (Span* span = large_.normal.next;
        span != &large_.normal;
@@ -151,7 +177,7 @@ void PageHeap::PrintLargeAllocStats() {
     fprintf(stderr, "\tSpan of size: %lu pages.\n", span->length);
   }
 
-  fprintf(stderr, "Returned list contents:\n");
+  fprintf(stderr, "[tcmalloc] Returned list contents:\n");
   for (Span* span = large_.returned.next;
        span != &large_.returned;
        span = span->next) {
