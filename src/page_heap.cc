@@ -142,6 +142,23 @@ Span* PageHeap::AllocLarge(Length n) {
   return best == NULL ? NULL : Carve(best, n);
 }
 
+void PageHeap::PrintLargeAllocStats() {
+  fprintf(stderr, "Free list contents:\n");
+
+  for (Span* span = large_.normal.next;
+       span != &large_.normal;
+       span = span->next) {
+    fprintf(stderr, "\tSpan of size: %lu pages.\n", span->length);
+  }
+
+  fprintf(stderr, "Returned list contents:\n");
+  for (Span* span = large_.returned.next;
+       span != &large_.returned;
+       span = span->next) {
+    fprintf(stderr, "\tSpan of size: %lu pages.\n", span->length);
+  }
+}
+
 Span* PageHeap::Split(Span* span, Length n) {
   ASSERT(0 < n);
   ASSERT(n < span->length);

@@ -189,6 +189,8 @@ class PERFTOOLS_DLL_DECL PageHeap {
   }
   void CacheSizeClass(PageID p, size_t cl) const { pagemap_cache_.Put(p, cl); }
 
+  void PrintLargeAllocStats();
+
  private:
   // Allocates a big block of memory for the pagemap once we reach more than
   // 128MB

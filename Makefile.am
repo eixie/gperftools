@@ -450,6 +450,7 @@ libtcmalloc_minimal_internal_la_SOURCES = src/common.cc \
                                           src/memfs_malloc.cc \
                                           src/central_freelist.cc \
                                           src/page_heap.cc \
+                                          src/page_heap_instrumentation.cc \
                                           src/sampler.cc \
                                           src/span.cc \
                                           src/stack_trace_table.cc \
