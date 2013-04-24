@@ -288,7 +288,7 @@ class PERFTOOLS_DLL_DECL PageHeap {
 
   struct largealloc {
     Length length;
-    unsigned satisfied;
+    Length satisfied_by;
   };
   static const int largealloc_cbuf_size = 100;
   struct largealloc largealloc_cbuf[largealloc_cbuf_size];
