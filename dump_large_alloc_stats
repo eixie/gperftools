@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require "socket"
+if ENV['TCMALLOC_INSTRUMENTATION_SOCKET']
+  UNIXSocket.new(ENV['TCMALLOC_INSTRUMENTATION_SOCKET']).write("a")
+else
+  abort("You must set TCMALLOC_INSTRUMENTATION_SOCKET for this script to work.")
+end
