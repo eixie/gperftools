@@ -54,6 +54,10 @@ class Static {
   // Must be called before calling any of the accessors below.
   static void InitStaticVars();
 
+  // Initializes the central heap for this large size class.
+  // Called by SizeMap. Requires pageheap_lock to be held.
+  static void InitLargeSizeClass(size_t cl);
+
   // Central cache -- an array of free-lists, one per size-class.
   // We have a separate lock per free-list to reduce contention.
   static CentralFreeListPadded* central_cache() { return central_cache_; }

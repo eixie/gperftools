@@ -110,6 +110,11 @@ Span* PageHeap::New(Length n) {
 }
 
 Span* PageHeap::AllocLarge(Length n) {
+  static int added = 0;
+  if (!added && n > kMaxPages) {
+    Static::sizemap()->AddLargeSizeClass(n);
+    added++;
+  }
   // find the best span (closest to n in size).
   // The following loops implements address-ordered best-fit.
   Span *best = NULL;

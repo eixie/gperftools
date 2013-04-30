@@ -1068,7 +1068,14 @@ inline void* do_malloc(size_t size) {
       ret = CheckedMallocResult(heap->Allocate(size, cl));
     }
   } else {
-    ret = do_malloc_pages(heap, size);
+    size_t cl = Static::sizemap()->LargeSizeClass(size);
+
+    if (cl == 0) {
+      ret = do_malloc_pages(heap, size);
+    } else {
+      size = Static::sizemap()->class_to_size(cl);
+      ret = CheckedMallocResult(heap->Allocate(size, cl));
+    }
   }
   if (ret == NULL) errno = ENOMEM;
   return ret;

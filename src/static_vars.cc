@@ -58,7 +58,7 @@ void Static::InitStaticVars() {
   bucket_allocator_.Init();
   // Do a bit of sanitizing: make sure central_cache is aligned properly
   CHECK_CONDITION((sizeof(central_cache_[0]) % 64) == 0);
-  for (int i = 0; i < kNumClasses; ++i) {
+  for (int i = 0; i < kNormalClasses; ++i) {
     central_cache_[i].Init(i);
   }
   // It's important to have PageHeap allocated, not in static storage,
@@ -68,6 +68,10 @@ void Static::InitStaticVars() {
   pageheap_ = new (MetaDataAlloc(sizeof(PageHeap))) PageHeap;
   DLL_Init(&sampled_objects_);
   Sampler::InitStatics();
+}
+
+void Static::InitLargeSizeClass(size_t cl) {
+  central_cache_[cl].Init(cl);
 }
 
 }  // namespace tcmalloc

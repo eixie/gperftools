@@ -33,6 +33,7 @@
 #include "config.h"
 #include "common.h"
 #include "system-alloc.h"
+#include "static_vars.h"
 
 namespace tcmalloc {
 
@@ -148,14 +149,14 @@ void SizeMap::Init() {
     class_to_size_[sc] = size;
     sc++;
   }
-  if (sc != kNumClasses) {
+  if (sc != kNormalClasses) {
     Log(kCrash, __FILE__, __LINE__,
-        "wrong number of size classes: (found vs. expected )", sc, kNumClasses);
+        "wrong number of size classes: (found vs. expected )", sc, kNormalClasses);
   }
 
   // Initialize the mapping arrays
   int next_size = 0;
-  for (int c = 1; c < kNumClasses; c++) {
+  for (int c = 1; c < kNormalClasses; c++) {
     const int max_size_in_class = class_to_size_[c];
     for (int s = next_size; s <= max_size_in_class; s += kAlignment) {
       class_array_[ClassIndex(s)] = c;
@@ -166,7 +167,7 @@ void SizeMap::Init() {
   // Double-check sizes just to be safe
   for (size_t size = 0; size <= kMaxSize; size++) {
     const int sc = SizeClass(size);
-    if (sc <= 0 || sc >= kNumClasses) {
+    if (sc <= 0 || sc >= kNormalClasses) {
       Log(kCrash, __FILE__, __LINE__,
           "Bad size class (class, size)", sc, size);
     }
@@ -182,9 +183,22 @@ void SizeMap::Init() {
   }
 
   // Initialize the num_objects_to_move array.
-  for (size_t cl = 1; cl  < kNumClasses; ++cl) {
+  for (size_t cl = 1; cl  < kNormalClasses; ++cl) {
     num_objects_to_move_[cl] = NumMoveSize(ByteSizeForClass(cl));
   }
+}
+
+// REQUIRED: pageheap_lock
+void SizeMap::AddLargeSizeClass(size_t pages) {
+  int cl = large_class(num_large_classes_);
+  int byte_size = pages * kPageSize;
+
+  class_to_size_[cl] = byte_size;
+  class_to_pages_[cl] = pages;
+  num_objects_to_move_[cl] = NumMoveSize(byte_size);
+  Static::InitLargeSizeClass(cl);
+
+  num_large_classes_++;
 }
 
 // Metadata allocator -- keeps stats about how many bytes allocated.

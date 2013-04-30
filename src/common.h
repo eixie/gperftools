@@ -63,10 +63,10 @@ typedef uintptr_t Length;
 
 #if defined(TCMALLOC_LARGE_PAGES)
 static const size_t kPageShift  = 15;
-static const size_t kNumClasses = 78;
+static const size_t kNormalClasses = 78;
 #else
 static const size_t kPageShift  = 13;
-static const size_t kNumClasses = 86;
+static const size_t kNormalClasses = 86;
 #endif
 static const size_t kMaxThreadCacheSize = 4 << 20;
 
@@ -85,6 +85,9 @@ static const size_t kDefaultOverallThreadCacheSize = kMaxThreadCacheSize;
 #else
 static const size_t kDefaultOverallThreadCacheSize = 8u * kMaxThreadCacheSize;
 #endif
+
+static const size_t kMaxLargeClasses = 5;
+static const size_t kNumClasses = kNormalClasses + kMaxLargeClasses;
 
 // Lower bound on the per-thread cache sizes
 static const size_t kMinThreadCacheSize = kMaxSize * 2;
@@ -134,6 +137,9 @@ int AlignmentForSize(size_t size);
 // Size-class information + mapping
 class SizeMap {
  private:
+  // The number of initialized large size classes.
+  int num_large_classes_;
+
   // Number of objects to move between a per-thread list and a central
   // list in one shot.  We want this to be not too small so we can
   // amortize the lock overhead for accessing the central list.  Making
@@ -193,6 +199,7 @@ class SizeMap {
 
   // Initialize the mapping arrays
   void Init();
+  void AddLargeSizeClass(size_t pages);
 
   inline int SizeClass(int size) {
     return class_array_[ClassIndex(size)];
@@ -220,6 +227,29 @@ class SizeMap {
   // per-thread free list until the scavenger cleans up the list.
   inline int num_objects_to_move(size_t cl) {
     return num_objects_to_move_[cl];
+  }
+
+  inline int large_class(int index) {
+    return kNormalClasses + index;
+  }
+
+  inline size_t LargeSizeClass(size_t size) {
+    if (num_large_classes_ == 0) {
+      return 0;
+    } else {
+      for(int i = 0; i < num_large_classes_; i++) {
+	int cl = large_class(i);
+	size_t cl_size = class_to_size(cl);
+
+	if (cl_size >= size &&
+	    (cl_size / size) <= 1 &&
+	     (cl_size % size) <= (cl_size * 0.1)) {
+	  return cl;
+	}
+      }
+
+      return 0;
+    }
   }
 };
 

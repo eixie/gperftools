@@ -333,7 +333,7 @@ inline bool ThreadCache::SampleAllocation(size_t k) {
 }
 
 inline void* ThreadCache::Allocate(size_t size, size_t cl) {
-  ASSERT(size <= kMaxSize);
+  ASSERT(size <= kMaxSize || cl >= kNormalClasses);
   ASSERT(size == Static::sizemap()->ByteSizeForClass(cl));
 
   FreeList* list = &list_[cl];
