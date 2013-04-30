@@ -1,0 +1,16 @@
+*.o
+/.libs
+/.deps
+*test
+*.lo
+*.la
+*.pc
+src/config.h*
+src/gperftools/tcmalloc.h
+src/stamp-h1
+src/windows/gperftools/tcmalloc.h
+libtool
+config.log
+config.status
+Makefile
+test.c
