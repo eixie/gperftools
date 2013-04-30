@@ -459,6 +459,7 @@ libtcmalloc_minimal_internal_la_SOURCES = src/common.cc \
                                           src/thread_cache.cc \
                                           src/malloc_hook.cc \
                                           src/malloc_extension.cc \
+                                          src/uniform_reservoir.cc \
                                           $(MAYBE_THREADS_CC) \
                                           $(TCMALLOC_MINIMAL_INCLUDES)
 # We #define NO_TCMALLOC_SAMPLES, since sampling is turned off for _minimal.

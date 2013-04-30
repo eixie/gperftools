@@ -588,8 +588,9 @@ am__libtcmalloc_internal_la_SOURCES_DIST = src/common.cc \
 	src/page_heap_instrumentation.cc src/sampler.cc src/span.cc \
 	src/stack_trace_table.cc src/static_vars.cc src/symbolize.cc \
 	src/thread_cache.cc src/malloc_hook.cc src/malloc_extension.cc \
-	src/maybe_threads.cc src/common.h src/internal_logging.h \
-	src/system-alloc.h src/packed-cache-inl.h src/base/spinlock.h \
+	src/uniform_reservoir.cc src/maybe_threads.cc src/common.h \
+	src/internal_logging.h src/system-alloc.h \
+	src/packed-cache-inl.h src/base/spinlock.h \
 	src/base/spinlock_internal.h src/base/atomicops.h \
 	src/base/atomicops-internals-macosx.h \
 	src/base/atomicops-internals-linuxppc.h \
@@ -640,7 +641,8 @@ am__objects_21 = libtcmalloc_internal_la-common.lo \
 	libtcmalloc_internal_la-symbolize.lo \
 	libtcmalloc_internal_la-thread_cache.lo \
 	libtcmalloc_internal_la-malloc_hook.lo \
-	libtcmalloc_internal_la-malloc_extension.lo $(am__objects_19) \
+	libtcmalloc_internal_la-malloc_extension.lo \
+	libtcmalloc_internal_la-uniform_reservoir.lo $(am__objects_19) \
 	$(am__objects_20)
 @WITH_HEAP_PROFILER_OR_CHECKER_TRUE@am_libtcmalloc_internal_la_OBJECTS =  \
 @WITH_HEAP_PROFILER_OR_CHECKER_TRUE@	$(am__objects_21) \
@@ -743,8 +745,9 @@ am__libtcmalloc_minimal_internal_la_SOURCES_DIST = src/common.cc \
 	src/page_heap_instrumentation.cc src/sampler.cc src/span.cc \
 	src/stack_trace_table.cc src/static_vars.cc src/symbolize.cc \
 	src/thread_cache.cc src/malloc_hook.cc src/malloc_extension.cc \
-	src/maybe_threads.cc src/common.h src/internal_logging.h \
-	src/system-alloc.h src/packed-cache-inl.h src/base/spinlock.h \
+	src/uniform_reservoir.cc src/maybe_threads.cc src/common.h \
+	src/internal_logging.h src/system-alloc.h \
+	src/packed-cache-inl.h src/base/spinlock.h \
 	src/base/spinlock_internal.h src/base/atomicops.h \
 	src/base/atomicops-internals-macosx.h \
 	src/base/atomicops-internals-linuxppc.h \
@@ -789,6 +792,7 @@ am_libtcmalloc_minimal_internal_la_OBJECTS =  \
 	libtcmalloc_minimal_internal_la-thread_cache.lo \
 	libtcmalloc_minimal_internal_la-malloc_hook.lo \
 	libtcmalloc_minimal_internal_la-malloc_extension.lo \
+	libtcmalloc_minimal_internal_la-uniform_reservoir.lo \
 	$(am__objects_24) $(am__objects_20)
 libtcmalloc_minimal_internal_la_OBJECTS =  \
 	$(am_libtcmalloc_minimal_internal_la_OBJECTS)
@@ -2254,6 +2258,7 @@ libtcmalloc_minimal_internal_la_SOURCES = src/common.cc \
                                           src/thread_cache.cc \
                                           src/malloc_hook.cc \
                                           src/malloc_extension.cc \
+                                          src/uniform_reservoir.cc \
                                           $(MAYBE_THREADS_CC) \
                                           $(TCMALLOC_MINIMAL_INCLUDES)
 
@@ -3176,6 +3181,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-symbolize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-system-alloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-thread_cache.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-uniform_reservoir.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_la-heap-checker-bcad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_la-heap-checker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_la-linuxthreads.Plo@am__quote@
@@ -3197,6 +3203,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-symbolize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-system-alloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-thread_cache.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-uniform_reservoir.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_la-tcmalloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logging.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/low_level_alloc_unittest-low_level_alloc.Po@am__quote@
@@ -3626,6 +3633,13 @@ libtcmalloc_internal_la-malloc_extension.lo: src/malloc_extension.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_internal_la-malloc_extension.lo `test -f 'src/malloc_extension.cc' || echo '$(srcdir)/'`src/malloc_extension.cc
 
+libtcmalloc_internal_la-uniform_reservoir.lo: src/uniform_reservoir.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_internal_la-uniform_reservoir.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_internal_la-uniform_reservoir.Tpo -c -o libtcmalloc_internal_la-uniform_reservoir.lo `test -f 'src/uniform_reservoir.cc' || echo '$(srcdir)/'`src/uniform_reservoir.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_internal_la-uniform_reservoir.Tpo $(DEPDIR)/libtcmalloc_internal_la-uniform_reservoir.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/uniform_reservoir.cc' object='libtcmalloc_internal_la-uniform_reservoir.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_internal_la-uniform_reservoir.lo `test -f 'src/uniform_reservoir.cc' || echo '$(srcdir)/'`src/uniform_reservoir.cc
+
 libtcmalloc_internal_la-maybe_threads.lo: src/maybe_threads.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_internal_la-maybe_threads.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_internal_la-maybe_threads.Tpo -c -o libtcmalloc_internal_la-maybe_threads.lo `test -f 'src/maybe_threads.cc' || echo '$(srcdir)/'`src/maybe_threads.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_internal_la-maybe_threads.Tpo $(DEPDIR)/libtcmalloc_internal_la-maybe_threads.Plo
@@ -3786,6 +3800,13 @@ libtcmalloc_minimal_internal_la-malloc_extension.lo: src/malloc_extension.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/malloc_extension.cc' object='libtcmalloc_minimal_internal_la-malloc_extension.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_minimal_internal_la-malloc_extension.lo `test -f 'src/malloc_extension.cc' || echo '$(srcdir)/'`src/malloc_extension.cc
+
+libtcmalloc_minimal_internal_la-uniform_reservoir.lo: src/uniform_reservoir.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_minimal_internal_la-uniform_reservoir.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_minimal_internal_la-uniform_reservoir.Tpo -c -o libtcmalloc_minimal_internal_la-uniform_reservoir.lo `test -f 'src/uniform_reservoir.cc' || echo '$(srcdir)/'`src/uniform_reservoir.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_minimal_internal_la-uniform_reservoir.Tpo $(DEPDIR)/libtcmalloc_minimal_internal_la-uniform_reservoir.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/uniform_reservoir.cc' object='libtcmalloc_minimal_internal_la-uniform_reservoir.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_minimal_internal_la-uniform_reservoir.lo `test -f 'src/uniform_reservoir.cc' || echo '$(srcdir)/'`src/uniform_reservoir.cc
 
 libtcmalloc_minimal_internal_la-maybe_threads.lo: src/maybe_threads.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_minimal_internal_la-maybe_threads.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_minimal_internal_la-maybe_threads.Tpo -c -o libtcmalloc_minimal_internal_la-maybe_threads.lo `test -f 'src/maybe_threads.cc' || echo '$(srcdir)/'`src/maybe_threads.cc
