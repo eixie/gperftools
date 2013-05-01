@@ -44,7 +44,7 @@ namespace tcmalloc {
 
 class UniformReservoir {
  public:
-  UniformReservoir();
+  void Init();
   
   inline int size() {
     if (count_ > kSize) {
@@ -54,7 +54,12 @@ class UniformReservoir {
     }
   }
 
+  inline int count() {
+    return count_;
+  }
+
   void update(size_t value);
+  void print();
 
  private:
   static const int kSize = 1028;
@@ -65,6 +70,11 @@ class UniformReservoir {
   size_t values_[kSize];
 
   size_t random(size_t max);
+
+  struct aggregate {
+    size_t value;
+    int count;
+  };
 };
 
 }  // namespace tcmalloc

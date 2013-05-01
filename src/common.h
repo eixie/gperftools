@@ -88,6 +88,8 @@ static const size_t kDefaultOverallThreadCacheSize = 8u * kMaxThreadCacheSize;
 
 static const size_t kMaxLargeClasses = 5;
 static const size_t kNumClasses = kNormalClasses + kMaxLargeClasses;
+static const float kLargeClassThreshold = 0.1;
+
 
 // Lower bound on the per-thread cache sizes
 static const size_t kMinThreadCacheSize = kMaxSize * 2;
@@ -250,6 +252,16 @@ class SizeMap {
 
       return 0;
     }
+  }
+
+  inline bool is_large_size_class(size_t pages) {
+    for(int i = 0; i < num_large_classes_; i++) {
+      if (class_to_pages(large_class(i) == pages)) {
+	return true;
+      }
+    }
+
+    return false;
   }
 };
 

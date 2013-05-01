@@ -34,10 +34,16 @@
 #include <time.h>
 #include "uniform_reservoir.h"
 #include "sampler.h"
+#include <stdio.h>
+#include <algorithm>
+#include "static_vars.h"
+
+using std::min;
 
 namespace tcmalloc {
 
-UniformReservoir::UniformReservoir() : rnd_(time(NULL)) {
+void UniformReservoir::Init() {
+  rnd_ = time(NULL);
 }
 
 void UniformReservoir::update(size_t value) {
@@ -45,7 +51,7 @@ void UniformReservoir::update(size_t value) {
   if (c < kSize) {
     values_[c] = value;
   } else {
-    const size_t r = random(c);
+    const size_t r = random(kSize*2);
     if (r < kSize) {
       values_[r] = value;
     }
@@ -62,5 +68,52 @@ size_t UniformReservoir::random(size_t max) {
 
   return val;
 }
+
+void UniformReservoir::print() {
+  size_t sorted_[kSize];
+  size_t threshold = static_cast<size_t>(kSize * kLargeClassThreshold);
+  struct aggregate aggregated_[static_cast<size_t>(kSize / threshold)];
+
+  size_t val, count;
+  unsigned int aggpointer = 0;
+
+  size_t total = (min)(count_, (size_t)kSize);
+
+  memcpy(&sorted_, &values_, kSize * sizeof(size_t));
+  std::sort(sorted_, sorted_ + kSize);
+
+  count = 0;
+  val = sorted_[0];
+
+  for(int i = 0; i < total; i++) {
+    if (sorted_[i] == val) {
+      count++;
+
+      if (i == (total - 1) && count > threshold) {
+	aggregated_[aggpointer].value = val;
+	aggregated_[aggpointer].count = count;
+	aggpointer++;
+      }
+    } else {
+      if (count > threshold) {
+	aggregated_[aggpointer].value = val;
+	aggregated_[aggpointer].count = count;
+	aggpointer++;
+      }
+
+      val = sorted_[i];
+      count = 0;
+      i--;
+    }
+  }
+
+  for (int i = 0; i < aggpointer; i++) {
+    if (!Static::sizemap()->is_large_size_class(aggregated_[i].value)) {
+      fprintf(stderr, "tcmalloc: promoting %lu to large size class\n", aggregated_[i].value);
+      Static::sizemap()->AddLargeSizeClass(aggregated_[i].value);
+    }
+  }
+}
+
 
 } // namespace tcmalloc

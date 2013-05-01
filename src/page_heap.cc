@@ -68,6 +68,7 @@ PageHeap::PageHeap()
     DLL_Init(&free_[i].normal);
     DLL_Init(&free_[i].returned);
   }
+  largealloc_sampler_.Init();
 }
 
 Span* PageHeap::SearchFreeAndLargeLists(Length n) {
@@ -110,11 +111,6 @@ Span* PageHeap::New(Length n) {
 }
 
 Span* PageHeap::AllocLarge(Length n) {
-  static int added = 0;
-  if (!added && n > kMaxPages) {
-    Static::sizemap()->AddLargeSizeClass(n);
-    added++;
-  }
   // find the best span (closest to n in size).
   // The following loops implements address-ordered best-fit.
   Span *best = NULL;
@@ -151,6 +147,12 @@ Span* PageHeap::AllocLarge(Length n) {
   largealloc_cbuf[largealloc_cbuf_index].satisfied_by = best ? best->length : 0;
   largealloc_cbuf_index++;
   if (largealloc_cbuf_index == 100) { largealloc_cbuf_index = 0; }
+  if (best != NULL) {
+    largealloc_sampler_.update(n);
+    if (largealloc_sampler_.count() % 1000 == 0) {
+      largealloc_sampler_.print();
+    }
+  }
 
   return best == NULL ? NULL : Carve(best, n);
 }

@@ -44,6 +44,7 @@
 #include "packed-cache-inl.h"
 #include "pagemap.h"
 #include "span.h"
+#include "uniform_reservoir.h"
 
 // We need to dllexport PageHeap just for the unittest.  MSVC complains
 // that we don't dllexport the PageHeap members, but we don't need to
@@ -293,6 +294,8 @@ class PERFTOOLS_DLL_DECL PageHeap {
   static const int largealloc_cbuf_size = 100;
   struct largealloc largealloc_cbuf[largealloc_cbuf_size];
   unsigned int largealloc_cbuf_index;
+
+  UniformReservoir largealloc_sampler_;
 };
 
 }  // namespace tcmalloc
