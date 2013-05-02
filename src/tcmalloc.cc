@@ -1073,7 +1073,6 @@ inline void* do_malloc(size_t size) {
     if (cl == 0) {
       ret = do_malloc_pages(heap, size);
     } else {
-      fprintf(stderr, "alloc from thread cache\n");
       size = Static::sizemap()->class_to_size(cl);
       ret = CheckedMallocResult(heap->Allocate(size, cl));
     }
