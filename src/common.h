@@ -256,7 +256,7 @@ class SizeMap {
 
   inline bool is_large_size_class(size_t pages) {
     for(int i = 0; i < num_large_classes_; i++) {
-      if (class_to_pages(large_class(i) == pages)) {
+      if (class_to_pages(large_class(i)) == pages) {
 	return true;
       }
     }
