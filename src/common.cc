@@ -190,15 +190,20 @@ void SizeMap::Init() {
 
 // REQUIRED: pageheap_lock
 void SizeMap::AddLargeSizeClass(size_t pages) {
-  int cl = large_class(num_large_classes_);
-  int byte_size = pages * kPageSize;
+  if (num_large_classes_ < (kMaxLargeClasses - 1) &&
+      !is_large_size_class(pages)) {
+    fprintf(stderr, "tcmalloc: promoting %lu to large size class\n", pages);
 
-  class_to_size_[cl] = byte_size;
-  class_to_pages_[cl] = pages;
-  num_objects_to_move_[cl] = NumMoveSize(byte_size);
-  Static::InitLargeSizeClass(cl);
+    int cl = large_class(num_large_classes_);
+    int byte_size = pages * kPageSize;
 
-  num_large_classes_++;
+    class_to_size_[cl] = byte_size;
+    class_to_pages_[cl] = pages;
+    num_objects_to_move_[cl] = NumMoveSize(byte_size);
+    Static::InitLargeSizeClass(cl);
+
+    num_large_classes_++;
+  }
 }
 
 // Metadata allocator -- keeps stats about how many bytes allocated.

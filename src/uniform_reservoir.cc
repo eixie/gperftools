@@ -108,10 +108,7 @@ void UniformReservoir::print() {
   }
 
   for (int i = 0; i < aggpointer; i++) {
-    if (!Static::sizemap()->is_large_size_class(aggregated_[i].value)) {
-      fprintf(stderr, "tcmalloc: promoting %lu to large size class\n", aggregated_[i].value);
-      Static::sizemap()->AddLargeSizeClass(aggregated_[i].value);
-    }
+    Static::sizemap()->AddLargeSizeClass(aggregated_[i].value);
   }
 }
 
