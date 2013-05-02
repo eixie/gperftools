@@ -365,7 +365,7 @@ inline void ThreadCache::Deallocate(void* ptr, size_t cl) {
     if (list_headroom < 0) {
       ListTooLong(list, cl);
     }
-    if (size_ >= max_size_) Scavenge();
+    if (size_ >= max_size_ && cl < kNormalClasses) Scavenge();
   }
 }
 
