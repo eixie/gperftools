@@ -1040,7 +1040,7 @@ inline void* do_malloc_pages(ThreadCache* heap, size_t size) {
     report_large = should_report_large(num_pages);
   } else {
     SpinLockHolder h(Static::pageheap_lock());
-    Span* span = Static::pageheap()->New(num_pages);
+    Span* span = Static::pageheap()->NewLarge(num_pages);
     result = (span == NULL ? NULL : SpanToMallocResult(span));
     report_large = should_report_large(num_pages);
   }

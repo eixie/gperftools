@@ -110,6 +110,11 @@ class PERFTOOLS_DLL_DECL PageHeap {
   // been rounded up already.
   Span* New(Length n);
 
+  // Exactly the same as New() except it samples allocations so that we
+  // can distinguish between calls to malloc() and other things that come through
+  // this code path, such as the central caches alloc'ing.
+  Span* NewLarge(Length n);
+
   // Delete the span "[p, p+n-1]".
   // REQUIRES: span was returned by earlier call to New() and
   //           has not yet been deleted.

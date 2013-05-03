@@ -94,6 +94,15 @@ Span* PageHeap::SearchFreeAndLargeLists(Length n) {
   return AllocLarge(n);  // May be NULL
 }
 
+Span* PageHeap::NewLarge(Length n) {
+  largealloc_sampler_.update(n);
+  if (largealloc_sampler_.count() % 1000 == 0) {
+    largealloc_sampler_.print();
+  }
+
+  return New(n);
+}
+
 Span* PageHeap::New(Length n) {
   ASSERT(Check());
   ASSERT(n > 0);
@@ -147,12 +156,6 @@ Span* PageHeap::AllocLarge(Length n) {
   largealloc_cbuf[largealloc_cbuf_index].satisfied_by = best ? best->length : 0;
   largealloc_cbuf_index++;
   if (largealloc_cbuf_index == 100) { largealloc_cbuf_index = 0; }
-  if (best != NULL) {
-    largealloc_sampler_.update(n);
-    if (largealloc_sampler_.count() % 1000 == 0) {
-      largealloc_sampler_.print();
-    }
-  }
 
   return best == NULL ? NULL : Carve(best, n);
 }
