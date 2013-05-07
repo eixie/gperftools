@@ -74,6 +74,18 @@ void Event(Span* span, char op, int v = 0);
 Span* NewSpan(PageID p, Length len);
 void DeleteSpan(Span* span);
 
+// Span compare for skip list
+inline int SpanCompare(Span* a, Span* b) {
+ if (a == NULL ||
+     (a->length < b->length || (a->length == b->length && a->start < b->start))) {
+   return -1;
+ } else if (a->length >= b->length && a->start > b->start) {
+   return 1;
+ } else {
+   return 0;
+ }
+}
+
 // -------------------------------------------------------------------------
 // Doubly linked list of spans.
 // -------------------------------------------------------------------------

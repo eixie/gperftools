@@ -28,47 +28,50 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---
-// Author: Ken Ashcraft <opensource@google.com>
+// Author: James Golick <jamesgolick@gmail.com>
 
-#include "static_vars.h"
-#include <stddef.h>                     // for NULL
-#include <new>                          // for operator new
-#include "internal_logging.h"  // for CHECK_CONDITION
+#ifndef TCMALLOC_SKIP_LIST_H_
+#define TCMALLOC_SKIP_LIST_H_
+
+#include <config.h>
 #include "common.h"
-#include "sampler.h"           // for Sampler
+#include "span.h"
+#include <unistd.h>
 
 namespace tcmalloc {
 
-SpinLock Static::pageheap_lock_(SpinLock::LINKER_INITIALIZED);
-SizeMap Static::sizemap_;
-CentralFreeListPadded Static::central_cache_[kNumClasses];
-PageHeapAllocator<Span> Static::span_allocator_;
-PageHeapAllocator<SkipList::Node> Static::skip_list_node_allocator_;
-PageHeapAllocator<StackTrace> Static::stacktrace_allocator_;
-Span Static::sampled_objects_;
-PageHeapAllocator<StackTraceTable::Bucket> Static::bucket_allocator_;
-StackTrace* Static::growth_stacks_ = NULL;
-PageHeap* Static::pageheap_ = NULL;
+class SkipList {
+  public:
+   static const unsigned int kSkipListHeight = 10;
 
-void Static::InitStaticVars() {
-  sizemap_.Init();
-  span_allocator_.Init();
-  span_allocator_.New(); // Reduce cache conflicts
-  span_allocator_.New(); // Reduce cache conflicts
-  stacktrace_allocator_.Init();
-  bucket_allocator_.Init();
-  // Do a bit of sanitizing: make sure central_cache is aligned properly
-  CHECK_CONDITION((sizeof(central_cache_[0]) % 64) == 0);
-  for (int i = 0; i < kNumClasses; ++i) {
-    central_cache_[i].Init(i);
-  }
-  // It's important to have PageHeap allocated, not in static storage,
-  // so that HeapLeakChecker does not consider all the byte patterns stored
-  // in is caches as pointers that are sources of heap object liveness,
-  // which leads to it missing some memory leaks.
-  pageheap_ = new (MetaDataAlloc(sizeof(PageHeap))) PageHeap;
-  DLL_Init(&sampled_objects_);
-  Sampler::InitStatics();
-}
+   void Init();
+   void Insert(Span* span);
+   Span* GetBestFit(size_t pages);
+
+   struct Node {
+     Node* forward[kSkipListHeight];
+     Node* backward[kSkipListHeight];
+     Span* value;
+   };
+
+  private:
+   unsigned int level_ : 4;
+   Node* head_;
+
+   Node* NewNode(Span* value);
+   void DeleteNode(Node* node);
+
+   // Straight jacked from src/base/low_level_alloc.cc
+   inline unsigned int random_level() {
+     static int32_t r = 1;
+     int result = 1;
+     while ((((r = r*1103515245 + 12345) >> 30) & 1) == 0) {
+       result++;
+     }
+     return result;
+   }
+};
 
 }  // namespace tcmalloc
+
+#endif  // TCMALLOC_SKIP_LIST_H_

@@ -323,6 +323,13 @@ atomicops_unittest_SOURCES = src/tests/atomicops_unittest.cc \
                              $(ATOMICOPS_UNITTEST_INCLUDES)
 atomicops_unittest_LDADD = $(LIBSPINLOCK)
 
+TESTS += skip_list_unittest
+SKIP_LIST_UNITTEST_INCLUDES = src/skip_list.h \
+                              $(LOGGING_INCLUDES)
+skip_list_unittest_SOURCES = src/tests/skip_list_unittest.cc \
+                             $(SKIP_LIST_UNITTEST_INCLUDES)
+skip_list_unittest_LDADD = $(LIBTCMALLOC_MINIMAL)
+
 
 ### ------- stack trace
 
@@ -452,6 +459,7 @@ libtcmalloc_minimal_internal_la_SOURCES = src/common.cc \
                                           src/page_heap.cc \
                                           src/page_heap_instrumentation.cc \
                                           src/sampler.cc \
+                                          src/skip_list.cc \
                                           src/span.cc \
                                           src/stack_trace_table.cc \
                                           src/static_vars.cc \
