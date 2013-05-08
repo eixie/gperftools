@@ -98,20 +98,22 @@ Span* SkipList::GetBestFit(size_t pages) {
       x = x->forward[0];
       Span* rv = x->value;
 
-      if (x->forward[i] == NULL && x->backward[i] == head_ && i == level_) {
-	level_--;
+      if (rv && rv->length >= pages) {
+	if (x->forward[i] == NULL && x->backward[i] == head_ && i == level_) {
+	  level_--;
+	}
+
+	for(int j = i; j >= 0; j--) {
+	  if (x->backward[j])
+	    x->backward[j]->forward[j] = x->forward[j];
+	  if (x->forward[j])
+	    x->forward[j]->backward[j] = x->backward[j];
+	}
+
+	DeleteNode(x);
+
+	return rv;
       }
-
-      for(int j = i; j >= 0; j--) {
-	if (x->backward[j])
-	  x->backward[j]->forward[j] = x->forward[j];
-	if (x->forward[j])
-	  x->forward[j]->backward[j] = x->backward[j];
-      }
-
-      DeleteNode(x);
-
-      return rv;
     }
   }
 

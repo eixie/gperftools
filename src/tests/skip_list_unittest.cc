@@ -65,6 +65,7 @@ static void TestSkipList() {
   list.Insert(span);
   list.Insert(span2);
 
+  CHECK_EQ(NULL, list.GetBestFit(20));
   CHECK_EQ(span3, list.GetBestFit(4));
   CHECK_EQ(span2, list.GetBestFit(1));
   // This check verifies that span2 has been removed from the list.
