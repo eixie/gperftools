@@ -66,11 +66,18 @@ static void TestSkipList() {
   list.Insert(span2);
 
   CHECK_EQ(NULL, list.GetBestFit(20));
+  list.Print();
   CHECK_EQ(span3, list.GetBestFit(4));
+  list.Print();
   CHECK_EQ(span2, list.GetBestFit(1));
+  list.Print();
   // This check verifies that span2 has been removed from the list.
   CHECK_EQ(span, list.GetBestFit(1));
+  list.Print();
+  // This check verifies that span2 has been removed from the list.
   CHECK_EQ(NULL, list.GetBestFit(1));
+  list.Insert(span2);
+  CHECK_EQ(span2, list.GetBestFit(1));
 }
 
 static void TestSpanCompare() {

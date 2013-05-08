@@ -62,6 +62,7 @@ PageHeap::PageHeap()
       release_index_(kMaxPages),
       largealloc_cbuf_index(0) {
   COMPILE_ASSERT(kNumClasses <= (1 << PageMapCache::kValuebits), valuebits);
+  ordered_large_.Init();
   DLL_Init(&large_.normal);
   DLL_Init(&large_.returned);
   for (int i = 0; i < kMaxPages; i++) {
@@ -110,42 +111,21 @@ Span* PageHeap::New(Length n) {
 }
 
 Span* PageHeap::AllocLarge(Length n) {
-  // find the best span (closest to n in size).
-  // The following loops implements address-ordered best-fit.
-  Span *best = NULL;
-
-  // Search through normal list
-  for (Span* span = large_.normal.next;
-       span != &large_.normal;
-       span = span->next) {
-    if (span->length >= n) {
-      if ((best == NULL)
-          || (span->length < best->length)
-          || ((span->length == best->length) && (span->start < best->start))) {
-        best = span;
-        ASSERT(best->location == Span::ON_NORMAL_FREELIST);
-      }
-    }
-  }
-
-  // Search through released list in case it has a better fit
-  for (Span* span = large_.returned.next;
-       span != &large_.returned;
-       span = span->next) {
-    if (span->length >= n) {
-      if ((best == NULL)
-          || (span->length < best->length)
-          || ((span->length == best->length) && (span->start < best->start))) {
-        best = span;
-        ASSERT(best->location == Span::ON_RETURNED_FREELIST);
-      }
-    }
+  fprintf(stderr, "alloclarge\n");
+  ordered_large_.Print();
+  Span *best = ordered_large_.GetBestFit(n);
+  if (best != NULL) {
+    ordered_large_.Print();
+    Span *best2 = ordered_large_.GetBestFit(n);
+    ordered_large_.Print();
+    ASSERT(best2 != best);
+    ordered_large_.Insert(best2);
   }
 
   largealloc_cbuf[largealloc_cbuf_index].length = n;
   largealloc_cbuf[largealloc_cbuf_index].satisfied_by = best ? best->length : 0;
   largealloc_cbuf_index++;
-  if (largealloc_cbuf_index == 100) { largealloc_cbuf_index = 0; }
+  if (largealloc_cbuf_index == 100) { largealloc_cbuf_index = 0; ordered_large_.Print(); }
 
   return best == NULL ? NULL : Carve(best, n);
 }
@@ -215,12 +195,14 @@ Span* PageHeap::Carve(Span* span, Length n) {
   Event(span, 'A', n);
 
   const int extra = span->length - n;
+  fprintf(stderr, "span->length: %lu, n: %lu, extra: %d\n", span->length, n,extra);
   ASSERT(extra >= 0);
   if (extra > 0) {
     Span* leftover = NewSpan(span->start + n, extra);
     leftover->location = old_location;
     Event(leftover, 'S', extra);
     RecordSpan(leftover);
+    fprintf(stderr, "leftover: %p ,span %p\n", leftover, span);
     PrependToFreeList(leftover);  // Skip coalescing - no candidates possible
     span->length = n;
     pagemap_.set(span->start + n - 1, span);
@@ -281,12 +263,25 @@ void PageHeap::MergeIntoFreeList(Span* span) {
     Event(span, 'R', len);
   }
 
+  fprintf(stderr, "coalesced block: %p %lu %d\n", span, span->length, (int)span->start);
+  ordered_large_.Print();
+
   PrependToFreeList(span);
 }
 
 void PageHeap::PrependToFreeList(Span* span) {
   ASSERT(span->location != Span::IN_USE);
-  SpanList* list = (span->length < kMaxPages) ? &free_[span->length] : &large_;
+  SpanList* list;
+  
+  if (span->length < kMaxPages) {
+    list = &free_[span->length];
+  } else {
+    list = &large_;
+    fprintf(stderr, "adding span of %lu size, %p\n", span->length, span);
+    ordered_large_.Insert(span);
+    ordered_large_.Print();
+  }
+
   if (span->location == Span::ON_NORMAL_FREELIST) {
     stats_.free_bytes += (span->length << kPageShift);
     DLL_Prepend(&list->normal, span);

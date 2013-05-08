@@ -120,4 +120,19 @@ Span* SkipList::GetBestFit(size_t pages) {
   return NULL;
 }
 
+void SkipList::Print() {
+  fprintf(stderr, "printing skip list of level: %d\n", level_);
+  for(int i = level_; i >= 0; i--) {
+    fprintf(stderr, "level %d: [", i);
+    Node* x = head_;
+    while(x->forward[i] != NULL) {
+      fprintf(stderr, "[%lu,%d,%p]", x->forward[i]->value->length,
+                                  (int)x->forward[i]->value->start,
+				  x->forward[i]->value);
+      x = x->forward[i];
+    }
+    fprintf(stderr, "]\n");
+  }
+}
+
 }

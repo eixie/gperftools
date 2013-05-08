@@ -48,6 +48,8 @@ class SkipList {
    void Insert(Span* span);
    Span* GetBestFit(size_t pages);
 
+   void Print();
+
    struct Node {
      Node* forward[kSkipListHeight];
      Node* backward[kSkipListHeight];
