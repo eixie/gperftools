@@ -57,11 +57,14 @@ void Static::InitStaticVars() {
   span_allocator_.New(); // Reduce cache conflicts
   stacktrace_allocator_.Init();
   bucket_allocator_.Init();
+  skip_list_node_allocator_.Init();
+
   // Do a bit of sanitizing: make sure central_cache is aligned properly
   CHECK_CONDITION((sizeof(central_cache_[0]) % 64) == 0);
   for (int i = 0; i < kNumClasses; ++i) {
     central_cache_[i].Init(i);
   }
+
   // It's important to have PageHeap allocated, not in static storage,
   // so that HeapLeakChecker does not consider all the byte patterns stored
   // in is caches as pointers that are sources of heap object liveness,

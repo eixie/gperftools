@@ -75,12 +75,39 @@ void SkipList::Insert(Span* span) {
 
   x = NewNode(span);
   for(int i = 0; i <= lvl; i++) {
-    x->forward[i] = update[i]->forward[i];
-    if (update[i]->forward[i])
-      update[i]->forward[i]->backward[i] = x;
+    ASSERT(update[i] != x);
 
+    x->forward[i] = update[i]->forward[i];
     update[i]->forward[i] = x;
-    x->backward[i] = update[i];
+  }
+}
+
+void SkipList::Remove(Span* span) {
+  Node* update[kSkipListHeight];
+  Node* x = head_;
+
+  for (int i = level_; i >= 0; i--) {
+    while(x->forward[i] && SpanCompare(x->forward[i]->value, span) == -1) {
+      x = x->forward[i];
+    }
+    update[i] = x;
+  }
+
+  x = x->forward[0];
+  if (x && x->value == span) {
+    for(int i = 0; i <= level_; i++) {
+      if (update[i]->forward[i] != x) {
+	break;
+      } else {
+	update[i]->forward[i] = x->forward[i];
+      }
+
+      //DeleteNode(x);
+
+      while(level_ > 0 && head_->forward[level_] == NULL) {
+	level_--;
+      }
+    }
   }
 }
 
@@ -99,19 +126,7 @@ Span* SkipList::GetBestFit(size_t pages) {
       Span* rv = x->value;
 
       if (rv && rv->length >= pages) {
-	if (x->forward[i] == NULL && x->backward[i] == head_ && i == level_) {
-	  level_--;
-	}
-
-	for(int j = i; j >= 0; j--) {
-	  if (x->backward[j])
-	    x->backward[j]->forward[j] = x->forward[j];
-	  if (x->forward[j])
-	    x->forward[j]->backward[j] = x->backward[j];
-	}
-
-	DeleteNode(x);
-
+	Remove(rv);
 	return rv;
       }
     }

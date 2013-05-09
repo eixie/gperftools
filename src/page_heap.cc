@@ -111,21 +111,12 @@ Span* PageHeap::New(Length n) {
 }
 
 Span* PageHeap::AllocLarge(Length n) {
-  fprintf(stderr, "alloclarge\n");
-  ordered_large_.Print();
   Span *best = ordered_large_.GetBestFit(n);
-  if (best != NULL) {
-    ordered_large_.Print();
-    Span *best2 = ordered_large_.GetBestFit(n);
-    ordered_large_.Print();
-    ASSERT(best2 != best);
-    ordered_large_.Insert(best2);
-  }
 
   largealloc_cbuf[largealloc_cbuf_index].length = n;
   largealloc_cbuf[largealloc_cbuf_index].satisfied_by = best ? best->length : 0;
   largealloc_cbuf_index++;
-  if (largealloc_cbuf_index == 100) { largealloc_cbuf_index = 0; ordered_large_.Print(); }
+  if (largealloc_cbuf_index == 100) { largealloc_cbuf_index = 0; }
 
   return best == NULL ? NULL : Carve(best, n);
 }
@@ -188,21 +179,23 @@ Span* PageHeap::Split(Span* span, Length n) {
 
 Span* PageHeap::Carve(Span* span, Length n) {
   ASSERT(n > 0);
+  if (span->location == Span::IN_USE) {
+    fprintf(stderr, "span in use %p %lu\n", span, span->length);
+  }
   ASSERT(span->location != Span::IN_USE);
   const int old_location = span->location;
   RemoveFromFreeList(span);
+  ordered_large_.Remove(span);
   span->location = Span::IN_USE;
   Event(span, 'A', n);
 
   const int extra = span->length - n;
-  fprintf(stderr, "span->length: %lu, n: %lu, extra: %d\n", span->length, n,extra);
   ASSERT(extra >= 0);
   if (extra > 0) {
     Span* leftover = NewSpan(span->start + n, extra);
     leftover->location = old_location;
     Event(leftover, 'S', extra);
     RecordSpan(leftover);
-    fprintf(stderr, "leftover: %p ,span %p\n", leftover, span);
     PrependToFreeList(leftover);  // Skip coalescing - no candidates possible
     span->length = n;
     pagemap_.set(span->start + n - 1, span);
@@ -244,6 +237,7 @@ void PageHeap::MergeIntoFreeList(Span* span) {
     // Merge preceding span into this span
     ASSERT(prev->start + prev->length == p);
     const Length len = prev->length;
+    ordered_large_.Remove(prev);
     RemoveFromFreeList(prev);
     DeleteSpan(prev);
     span->start -= len;
@@ -257,14 +251,12 @@ void PageHeap::MergeIntoFreeList(Span* span) {
     ASSERT(next->start == p+n);
     const Length len = next->length;
     RemoveFromFreeList(next);
+    ordered_large_.Remove(next);
     DeleteSpan(next);
     span->length += len;
     pagemap_.set(span->start + span->length - 1, span);
     Event(span, 'R', len);
   }
-
-  fprintf(stderr, "coalesced block: %p %lu %d\n", span, span->length, (int)span->start);
-  ordered_large_.Print();
 
   PrependToFreeList(span);
 }
@@ -277,9 +269,7 @@ void PageHeap::PrependToFreeList(Span* span) {
     list = &free_[span->length];
   } else {
     list = &large_;
-    fprintf(stderr, "adding span of %lu size, %p\n", span->length, span);
     ordered_large_.Insert(span);
-    ordered_large_.Print();
   }
 
   if (span->location == Span::ON_NORMAL_FREELIST) {
@@ -336,6 +326,7 @@ Length PageHeap::ReleaseLastNormalSpan(SpanList* slist) {
   Span* s = slist->normal.prev;
   ASSERT(s->location == Span::ON_NORMAL_FREELIST);
   RemoveFromFreeList(s);
+  ordered_large_.Remove(s);
   const Length n = s->length;
   TCMalloc_SystemRelease(reinterpret_cast<void*>(s->start << kPageShift),
                          static_cast<size_t>(s->length << kPageShift));

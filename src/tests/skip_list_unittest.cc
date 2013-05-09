@@ -61,9 +61,9 @@ static void TestSkipList() {
 
   SkipList list;
   list.Init();
+  list.Print();
   list.Insert(span3);
-  list.Insert(span);
-  list.Insert(span2);
+  list.Print();
 
   CHECK_EQ(NULL, list.GetBestFit(20));
   list.Print();

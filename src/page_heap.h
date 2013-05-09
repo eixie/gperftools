@@ -232,12 +232,12 @@ class PERFTOOLS_DLL_DECL PageHeap {
   // List of free spans of length >= kMaxPages
   SpanList large_;
 
+  // Array mapping from span length to a doubly linked list of free spans
+  SpanList free_[kMaxPages];
+
   // Skip list of large spans for efficiently finding a best-fit
   // span for large allocs
   SkipList ordered_large_;
-
-  // Array mapping from span length to a doubly linked list of free spans
-  SpanList free_[kMaxPages];
 
   // Statistics on system, free, and unmapped bytes
   Stats stats_;

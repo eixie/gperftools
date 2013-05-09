@@ -46,13 +46,13 @@ class SkipList {
 
    void Init();
    void Insert(Span* span);
+   void Remove(Span* span);
    Span* GetBestFit(size_t pages);
 
    void Print();
 
    struct Node {
      Node* forward[kSkipListHeight];
-     Node* backward[kSkipListHeight];
      Span* value;
    };
 

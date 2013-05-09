@@ -70,7 +70,9 @@ class Static {
 
   static PageHeapAllocator<Span>* span_allocator() { return &span_allocator_; }
 
-  static PageHeapAllocator<SkipList::Node>* skip_list_node_allocator() { return &skip_list_node_allocator_; }
+  static PageHeapAllocator<SkipList::Node>* skip_list_node_allocator() {
+    return &skip_list_node_allocator_;
+  }
 
   static PageHeapAllocator<StackTrace>* stacktrace_allocator() {
     return &stacktrace_allocator_;
