@@ -48,6 +48,7 @@ class SkipList {
    void Insert(Span* span);
    void Remove(Span* span);
    Span* GetBestFit(size_t pages);
+   bool Includes(Span* span);
 
    void Print();
 

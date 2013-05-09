@@ -67,10 +67,14 @@ void SkipList::Insert(Span* span) {
 
   unsigned int lvl = random_level();
   if (lvl > level_) {
-    // increase the level of the list by a maximum of 1 as per the paper
-    lvl = level_ + 1;
-    level_ = lvl;
-    update[lvl] = head_;
+    if (level_ == kSkipListHeight - 1) {
+      lvl = level_;
+    } else {
+      // increase the level of the list by a maximum of 1 as per the paper
+      lvl = level_ + 1;
+      level_ = lvl;
+      update[lvl] = head_;
+    }
   }
 
   x = NewNode(span);
@@ -101,14 +105,20 @@ void SkipList::Remove(Span* span) {
       } else {
 	update[i]->forward[i] = x->forward[i];
       }
+    }
 
-      //DeleteNode(x);
+    DeleteNode(x);
 
-      while(level_ > 0 && head_->forward[level_] == NULL) {
-	level_--;
-      }
+    while(level_ > 0 && head_->forward[level_] == NULL) {
+      level_--;
     }
   }
+
+  /*if (Includes(span)) {*/
+  /*  fprintf(stderr, "we were supposed to remove %p but we didn't :(\n", span);*/
+  /*  Print();*/
+  /*  ASSERT(!Includes(span));*/
+  /*}*/
 }
 
 Span* SkipList::GetBestFit(size_t pages) {
@@ -133,6 +143,18 @@ Span* SkipList::GetBestFit(size_t pages) {
   }
 
   return NULL;
+}
+
+bool SkipList::Includes(Span* span) {
+  Node* x = head_;
+  while(x->forward[0] != NULL) {
+    if (x->forward[0]->value == span) {
+      return true;
+    }
+    x = x->forward[0];
+  }
+
+  return false;
 }
 
 void SkipList::Print() {
