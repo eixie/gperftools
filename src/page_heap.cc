@@ -185,9 +185,7 @@ Span* PageHeap::Carve(Span* span, Length n) {
   ASSERT(span->location != Span::IN_USE);
   const int old_location = span->location;
   RemoveFromFreeList(span);
-  if (span->length >= kMaxPages) {
-    ordered_large_.Remove(span);
-  }
+  ordered_large_.Remove(span);
   span->location = Span::IN_USE;
   Event(span, 'A', n);
 
@@ -239,9 +237,7 @@ void PageHeap::MergeIntoFreeList(Span* span) {
     // Merge preceding span into this span
     ASSERT(prev->start + prev->length == p);
     const Length len = prev->length;
-    if (prev->length >= kMaxPages) {
-      ordered_large_.Remove(prev);
-    }
+    ordered_large_.Remove(prev);
     RemoveFromFreeList(prev);
     DeleteSpan(prev);
     span->start -= len;
@@ -255,9 +251,7 @@ void PageHeap::MergeIntoFreeList(Span* span) {
     ASSERT(next->start == p+n);
     const Length len = next->length;
     RemoveFromFreeList(next);
-    if (next->length >= kMaxPages) {
-      ordered_large_.Remove(next);
-    }
+    ordered_large_.Remove(next);
     DeleteSpan(next);
     span->length += len;
     pagemap_.set(span->start + span->length - 1, span);
@@ -332,9 +326,7 @@ Length PageHeap::ReleaseLastNormalSpan(SpanList* slist) {
   Span* s = slist->normal.prev;
   ASSERT(s->location == Span::ON_NORMAL_FREELIST);
   RemoveFromFreeList(s);
-  if (s->length >= kMaxPages) {
-    ordered_large_.Remove(s);
-  }
+  ordered_large_.Remove(s);
   const Length n = s->length;
   TCMalloc_SystemRelease(reinterpret_cast<void*>(s->start << kPageShift),
                          static_cast<size_t>(s->length << kPageShift));

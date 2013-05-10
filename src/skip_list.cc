@@ -96,15 +96,10 @@ void SkipList::Insert(Span* span) {
 double
 get_time()
 {
-  struct rusage usage;
-  struct timeval time;
-  getrusage(RUSAGE_SELF, &usage);
-  time = usage.ru_utime;
-  return time.tv_sec + time.tv_usec * 1e-6;
+  return 0;
 }
 
 void SkipList::Remove(Span* span) {
-  double start = get_time();
   if (span->ordered_free_list_ptr) {
     Node* x = (Node*)span->ordered_free_list_ptr;
     
@@ -125,8 +120,6 @@ void SkipList::Remove(Span* span) {
 
     span->ordered_free_list_ptr = NULL;
   }
-
-  remove_time_ += get_time() - start;
 }
 
 Span* SkipList::GetBestFit(size_t pages) {
