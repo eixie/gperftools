@@ -93,12 +93,6 @@ void SkipList::Insert(Span* span) {
   }
 }
 
-double
-get_time()
-{
-  return 0;
-}
-
 void SkipList::Remove(Span* span) {
   if (span->ordered_free_list_ptr) {
     Node* x = (Node*)span->ordered_free_list_ptr;
