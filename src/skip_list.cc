@@ -35,6 +35,7 @@
 #include "skip_list.h"
 #include "span.h"
 #include "static_vars.h"
+#include <sys/resource.h>
 
 namespace tcmalloc {
 
@@ -51,6 +52,7 @@ void SkipList::DeleteNode(Node* node) {
 
 void SkipList::Init() {
   level_ = 0;
+  remove_time_ = 0;
   head_ = NewNode(NULL);
 }
 
@@ -78,47 +80,53 @@ void SkipList::Insert(Span* span) {
   }
 
   x = NewNode(span);
+  span->ordered_free_list_ptr = (void*)x;
   for(int i = 0; i <= lvl; i++) {
     ASSERT(update[i] != x);
 
     x->forward[i] = update[i]->forward[i];
+    if (update[i]->forward[i])
+      update[i]->forward[i]->backward[i] = x;
+
     update[i]->forward[i] = x;
+    x->backward[i] = update[i];
   }
 }
 
+double
+get_time()
+{
+  struct rusage usage;
+  struct timeval time;
+  getrusage(RUSAGE_SELF, &usage);
+  time = usage.ru_utime;
+  return time.tv_sec + time.tv_usec * 1e-6;
+}
+
 void SkipList::Remove(Span* span) {
-  Node* update[kSkipListHeight];
-  Node* x = head_;
-
-  for (int i = level_; i >= 0; i--) {
-    while(x->forward[i] && SpanCompare(x->forward[i]->value, span) == -1) {
-      x = x->forward[i];
-    }
-    update[i] = x;
-  }
-
-  x = x->forward[0];
-  if (x && x->value == span) {
-    for(int i = 0; i <= level_; i++) {
-      if (update[i]->forward[i] != x) {
-	break;
-      } else {
-	update[i]->forward[i] = x->forward[i];
-      }
+  double start = get_time();
+  if (span->ordered_free_list_ptr) {
+    Node* x = (Node*)span->ordered_free_list_ptr;
+    
+    for(int i = 0; i <= level_ && x->backward[i]; i++) {
+      ASSERT(x->backward[i]->forward[i] == x);
+      x->backward[i]->forward[i] = x->forward[i];
+      ASSERT(!x->forward[i] || x->forward[i]->backward[i] == x);
+      if (x->forward[i])
+	x->forward[i]->backward[i] = x->backward[i];
+      ASSERT(x->backward[i] != x->forward[i]);
     }
 
     DeleteNode(x);
 
-    while(level_ > 0 && head_->forward[level_] == NULL) {
+    while(level_ > 0 && !head_->forward[level_]) {
       level_--;
     }
+
+    span->ordered_free_list_ptr = NULL;
   }
 
-  /*if (Includes(span)) {*/
-  /*  fprintf(stderr, "we were supposed to remove %p but we didn't :(\n", span);*/
-  /*  Print();*/
-  /*  ASSERT(!Includes(span));*/
-  /*}*/
+  remove_time_ += get_time() - start;
 }
 
 Span* SkipList::GetBestFit(size_t pages) {
@@ -126,8 +134,7 @@ Span* SkipList::GetBestFit(size_t pages) {
 
   for (int i = level_; i >= 0; i--) {
     while(x->forward[i] &&
-	    x->forward[i]->value &&
-	      x->forward[i]->value->length < pages) {
+	  x->forward[i]->value->length < pages) {
       x = x->forward[i];
     }
 
@@ -158,13 +165,14 @@ bool SkipList::Includes(Span* span) {
 }
 
 void SkipList::Print() {
-  fprintf(stderr, "printing skip list of level: %d\n", level_);
+  fprintf(stderr, "printing skip list of level: %d remove time: %dms\n", level_,
+	      (int)(remove_time_ * 1000));
   for(int i = level_; i >= 0; i--) {
     fprintf(stderr, "level %d: [", i);
     Node* x = head_;
     while(x->forward[i] != NULL) {
-      fprintf(stderr, "[%lu,%d,%p]", x->forward[i]->value->length,
-                                  (int)x->forward[i]->value->start,
+      fprintf(stderr, "[%lu,%u,%p]", x->forward[i]->value->length,
+                                  (unsigned int)x->forward[i]->value->start,
 				  x->forward[i]->value);
       x = x->forward[i];
     }

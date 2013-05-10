@@ -44,6 +44,8 @@ class SkipList {
   public:
    static const unsigned int kSkipListHeight = 10;
 
+   double remove_time_;
+
    void Init();
    void Insert(Span* span);
    void Remove(Span* span);
@@ -54,6 +56,7 @@ class SkipList {
 
    struct Node {
      Node* forward[kSkipListHeight];
+     Node* backward[kSkipListHeight];
      Span* value;
    };
 
