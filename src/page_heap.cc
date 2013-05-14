@@ -170,9 +170,6 @@ Span* PageHeap::Split(Span* span, Length n) {
 
 Span* PageHeap::Carve(Span* span, Length n) {
   ASSERT(n > 0);
-  if (span->location == Span::IN_USE) {
-    fprintf(stderr, "span in use %p %lu\n", span, span->length);
-  }
   ASSERT(span->location != Span::IN_USE);
   const int old_location = span->location;
   RemoveFromFreeList(span);
