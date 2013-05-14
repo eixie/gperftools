@@ -1,4 +1,4 @@
-// Copyright (c) 2008, Google Inc.
+// Copyright (c) 2013, Google Inc., James Golick
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
