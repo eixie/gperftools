@@ -281,7 +281,7 @@ void PageHeap::RemoveFromFreeList(Span* span) {
     stats_.unmapped_bytes -= (span->length << kPageShift);
   }
 
-  if (span->length > kMaxPages) {
+  if (span->length >= kMaxPages) {
     if (using_large_skiplist_) {
       large_skiplist_.Remove(span);
     }
