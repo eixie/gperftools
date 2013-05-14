@@ -255,7 +255,7 @@ void PageHeap::PrependToFreeList(Span* span) {
   } else {
     list = &large_;
     large_lists_size_++;
-    if (large_lists_size_ == kLargeSkipListThreshold && !using_large_skiplist_) {
+    if (large_lists_size_ == kLargeSkiplistThreshold && !using_large_skiplist_) {
       InitializeLargeSkiplist();
     }
 

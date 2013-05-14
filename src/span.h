@@ -40,7 +40,7 @@
 
 namespace tcmalloc {
 
-struct SkipListNode;
+struct SkiplistNode;
 
 // Information kept for a span (a contiguous run of pages).
 struct Span {
@@ -53,7 +53,7 @@ struct Span {
   unsigned int  sizeclass : 8;     // Size-class for small objects (or 0)
   unsigned int  location : 2;      // Is the span on a freelist, and if so, which?
   unsigned int  sample : 1;        // Sampled object?
-  SkipListNode* skiplist_node_ptr; // Make SkipList removal constant-time
+  SkiplistNode* skiplist_node_ptr; // Make Skiplist removal constant-time
 
 #undef SPAN_HISTORY
 #ifdef SPAN_HISTORY

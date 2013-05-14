@@ -67,7 +67,7 @@ host_triplet = @host@
 @ENABLE_FRAME_POINTERS_FALSE@@X86_64_AND_NO_FP_BY_DEFAULT_TRUE@am__append_6 = -DNO_FRAME_POINTER
 @MINGW_TRUE@am__append_7 = -Wl,-u__tcmalloc
 TESTS = low_level_alloc_unittest$(EXEEXT) atomicops_unittest$(EXEEXT) \
-	skip_list_unittest$(EXEEXT) $(am__EXEEXT_9) \
+	skiplist_unittest$(EXEEXT) $(am__EXEEXT_9) \
 	tcmalloc_minimal_unittest$(EXEEXT) \
 	tcmalloc_minimal_large_unittest$(EXEEXT) $(am__append_17) \
 	addressmap_unittest$(EXEEXT) $(am__EXEEXT_10) \
@@ -586,7 +586,7 @@ libtcmalloc_debug_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 am__libtcmalloc_internal_la_SOURCES_DIST = src/common.cc \
 	src/internal_logging.cc src/system-alloc.cc \
 	src/memfs_malloc.cc src/central_freelist.cc src/page_heap.cc \
-	src/sampler.cc src/skip_list.cc src/span.cc \
+	src/sampler.cc src/skiplist.cc src/span.cc \
 	src/stack_trace_table.cc src/static_vars.cc src/symbolize.cc \
 	src/thread_cache.cc src/malloc_hook.cc src/malloc_extension.cc \
 	src/maybe_threads.cc src/common.h src/internal_logging.h \
@@ -634,7 +634,7 @@ am__objects_21 = libtcmalloc_internal_la-common.lo \
 	libtcmalloc_internal_la-central_freelist.lo \
 	libtcmalloc_internal_la-page_heap.lo \
 	libtcmalloc_internal_la-sampler.lo \
-	libtcmalloc_internal_la-skip_list.lo \
+	libtcmalloc_internal_la-skiplist.lo \
 	libtcmalloc_internal_la-span.lo \
 	libtcmalloc_internal_la-stack_trace_table.lo \
 	libtcmalloc_internal_la-static_vars.lo \
@@ -741,7 +741,7 @@ libtcmalloc_minimal_internal_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 am__libtcmalloc_minimal_internal_la_SOURCES_DIST = src/common.cc \
 	src/internal_logging.cc src/system-alloc.cc \
 	src/memfs_malloc.cc src/central_freelist.cc src/page_heap.cc \
-	src/sampler.cc src/skip_list.cc src/span.cc \
+	src/sampler.cc src/skiplist.cc src/span.cc \
 	src/stack_trace_table.cc src/static_vars.cc src/symbolize.cc \
 	src/thread_cache.cc src/malloc_hook.cc src/malloc_extension.cc \
 	src/maybe_threads.cc src/common.h src/internal_logging.h \
@@ -782,7 +782,7 @@ am_libtcmalloc_minimal_internal_la_OBJECTS =  \
 	libtcmalloc_minimal_internal_la-central_freelist.lo \
 	libtcmalloc_minimal_internal_la-page_heap.lo \
 	libtcmalloc_minimal_internal_la-sampler.lo \
-	libtcmalloc_minimal_internal_la-skip_list.lo \
+	libtcmalloc_minimal_internal_la-skiplist.lo \
 	libtcmalloc_minimal_internal_la-span.lo \
 	libtcmalloc_minimal_internal_la-stack_trace_table.lo \
 	libtcmalloc_minimal_internal_la-static_vars.lo \
@@ -852,7 +852,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 @WITH_CPU_PROFILER_TRUE@	profiler_unittest.sh$(EXEEXT)
 @WITH_CPU_PROFILER_TRUE@@WITH_HEAP_PROFILER_OR_CHECKER_TRUE@am__EXEEXT_22 = tcmalloc_and_profiler_unittest$(EXEEXT)
 am__EXEEXT_23 = low_level_alloc_unittest$(EXEEXT) \
-	atomicops_unittest$(EXEEXT) skip_list_unittest$(EXEEXT) \
+	atomicops_unittest$(EXEEXT) skiplist_unittest$(EXEEXT) \
 	$(am__EXEEXT_9) tcmalloc_minimal_unittest$(EXEEXT) \
 	tcmalloc_minimal_large_unittest$(EXEEXT) $(am__append_17) \
 	addressmap_unittest$(EXEEXT) $(am__EXEEXT_10) \
@@ -1355,10 +1355,9 @@ simple_compat_test_OBJECTS = $(am_simple_compat_test_OBJECTS)
 simple_compat_test_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(simple_compat_test_LDFLAGS) $(LDFLAGS) -o $@
-am_skip_list_unittest_OBJECTS = skip_list_unittest.$(OBJEXT) \
-	$(am__objects_6)
-skip_list_unittest_OBJECTS = $(am_skip_list_unittest_OBJECTS)
-skip_list_unittest_DEPENDENCIES = $(LIBTCMALLOC_MINIMAL)
+am_skiplist_unittest_OBJECTS = skiplist_unittest.$(OBJEXT)
+skiplist_unittest_OBJECTS = $(am_skiplist_unittest_OBJECTS)
+skiplist_unittest_DEPENDENCIES = $(LIBTCMALLOC_MINIMAL)
 am_stack_trace_table_test_OBJECTS =  \
 	stack_trace_table_test-stack_trace_table_test.$(OBJEXT)
 stack_trace_table_test_OBJECTS = $(am_stack_trace_table_test_OBJECTS)
@@ -1596,8 +1595,7 @@ SOURCES = $(liblogging_la_SOURCES) $(libprofiler_la_SOURCES) \
 	$(sampler_test_SOURCES) $(sampling_debug_test_SOURCES) \
 	$(sampling_debug_test_sh_SOURCES) $(sampling_test_SOURCES) \
 	$(sampling_test_sh_SOURCES) $(simple_compat_test_SOURCES) \
-	$(skip_list_unittest_SOURCES) \
-	$(stack_trace_table_test_SOURCES) \
+	$(skiplist_unittest_SOURCES) $(stack_trace_table_test_SOURCES) \
 	$(stacktrace_unittest_SOURCES) \
 	$(system_alloc_unittest_SOURCES) \
 	$(tcmalloc_and_profiler_unittest_SOURCES) \
@@ -1663,8 +1661,7 @@ DIST_SOURCES = $(liblogging_la_SOURCES) \
 	$(am__sampling_test_SOURCES_DIST) \
 	$(am__sampling_test_sh_SOURCES_DIST) \
 	$(am__simple_compat_test_SOURCES_DIST) \
-	$(skip_list_unittest_SOURCES) \
-	$(stack_trace_table_test_SOURCES) \
+	$(skiplist_unittest_SOURCES) $(stack_trace_table_test_SOURCES) \
 	$(am__stacktrace_unittest_SOURCES_DIST) \
 	$(am__system_alloc_unittest_SOURCES_DIST) \
 	$(am__tcmalloc_and_profiler_unittest_SOURCES_DIST) \
@@ -2161,13 +2158,13 @@ atomicops_unittest_SOURCES = src/tests/atomicops_unittest.cc \
                              $(ATOMICOPS_UNITTEST_INCLUDES)
 
 atomicops_unittest_LDADD = $(LIBSPINLOCK)
-SKIP_LIST_UNITTEST_INCLUDES = src/skip_list.h \
+SKIPLIST_UNITTEST_INCLUDES = src/skiplist.h \
                               $(LOGGING_INCLUDES)
 
-skip_list_unittest_SOURCES = src/tests/skip_list_unittest.cc \
+skiplist_unittest_SOURCES = src/tests/skiplist_unittest.cc \
                              $(SKIP_LIST_UNITTEST_INCLUDES)
 
-skip_list_unittest_LDADD = $(LIBTCMALLOC_MINIMAL)
+skiplist_unittest_LDADD = $(LIBTCMALLOC_MINIMAL)
 
 ### ------- stack trace
 
@@ -2260,7 +2257,7 @@ libtcmalloc_minimal_internal_la_SOURCES = src/common.cc \
                                           src/central_freelist.cc \
                                           src/page_heap.cc \
                                           src/sampler.cc \
-                                          src/skip_list.cc \
+                                          src/skiplist.cc \
                                           src/span.cc \
                                           src/stack_trace_table.cc \
                                           src/static_vars.cc \
@@ -3080,9 +3077,9 @@ sampling_test$(EXEEXT): $(sampling_test_OBJECTS) $(sampling_test_DEPENDENCIES)
 simple_compat_test$(EXEEXT): $(simple_compat_test_OBJECTS) $(simple_compat_test_DEPENDENCIES) 
 	@rm -f simple_compat_test$(EXEEXT)
 	$(simple_compat_test_LINK) $(simple_compat_test_OBJECTS) $(simple_compat_test_LDADD) $(LIBS)
-skip_list_unittest$(EXEEXT): $(skip_list_unittest_OBJECTS) $(skip_list_unittest_DEPENDENCIES) 
-	@rm -f skip_list_unittest$(EXEEXT)
-	$(CXXLINK) $(skip_list_unittest_OBJECTS) $(skip_list_unittest_LDADD) $(LIBS)
+skiplist_unittest$(EXEEXT): $(skiplist_unittest_OBJECTS) $(skiplist_unittest_DEPENDENCIES) 
+	@rm -f skiplist_unittest$(EXEEXT)
+	$(CXXLINK) $(skiplist_unittest_OBJECTS) $(skiplist_unittest_LDADD) $(LIBS)
 stack_trace_table_test$(EXEEXT): $(stack_trace_table_test_OBJECTS) $(stack_trace_table_test_DEPENDENCIES) 
 	@rm -f stack_trace_table_test$(EXEEXT)
 	$(stack_trace_table_test_LINK) $(stack_trace_table_test_OBJECTS) $(stack_trace_table_test_LDADD) $(LIBS)
@@ -3186,7 +3183,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-page_heap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-raw_printer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-sampler.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-skip_list.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-skiplist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-span.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-stack_trace_table.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-static_vars.Plo@am__quote@
@@ -3207,7 +3204,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-memfs_malloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-page_heap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-sampler.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-skip_list.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-skiplist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-span.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-stack_trace_table.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-static_vars.Plo@am__quote@
@@ -3260,7 +3257,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sampling_debug_test-sampling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sampling_test-sampling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple_compat_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/skip_list_unittest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/skiplist_unittest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spinlock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spinlock_internal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stack_trace_table_test-stack_trace_table_test.Po@am__quote@
@@ -3588,12 +3585,12 @@ libtcmalloc_internal_la-sampler.lo: src/sampler.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_internal_la-sampler.lo `test -f 'src/sampler.cc' || echo '$(srcdir)/'`src/sampler.cc
 
-libtcmalloc_internal_la-skip_list.lo: src/skip_list.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_internal_la-skip_list.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_internal_la-skip_list.Tpo -c -o libtcmalloc_internal_la-skip_list.lo `test -f 'src/skip_list.cc' || echo '$(srcdir)/'`src/skip_list.cc
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_internal_la-skip_list.Tpo $(DEPDIR)/libtcmalloc_internal_la-skip_list.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/skip_list.cc' object='libtcmalloc_internal_la-skip_list.lo' libtool=yes @AMDEPBACKSLASH@
+libtcmalloc_internal_la-skiplist.lo: src/skiplist.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_internal_la-skiplist.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_internal_la-skiplist.Tpo -c -o libtcmalloc_internal_la-skiplist.lo `test -f 'src/skiplist.cc' || echo '$(srcdir)/'`src/skiplist.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_internal_la-skiplist.Tpo $(DEPDIR)/libtcmalloc_internal_la-skiplist.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/skiplist.cc' object='libtcmalloc_internal_la-skiplist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_internal_la-skip_list.lo `test -f 'src/skip_list.cc' || echo '$(srcdir)/'`src/skip_list.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_internal_la-skiplist.lo `test -f 'src/skiplist.cc' || echo '$(srcdir)/'`src/skiplist.cc
 
 libtcmalloc_internal_la-span.lo: src/span.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_internal_la-span.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_internal_la-span.Tpo -c -o libtcmalloc_internal_la-span.lo `test -f 'src/span.cc' || echo '$(srcdir)/'`src/span.cc
@@ -3749,12 +3746,12 @@ libtcmalloc_minimal_internal_la-sampler.lo: src/sampler.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_minimal_internal_la-sampler.lo `test -f 'src/sampler.cc' || echo '$(srcdir)/'`src/sampler.cc
 
-libtcmalloc_minimal_internal_la-skip_list.lo: src/skip_list.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_minimal_internal_la-skip_list.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_minimal_internal_la-skip_list.Tpo -c -o libtcmalloc_minimal_internal_la-skip_list.lo `test -f 'src/skip_list.cc' || echo '$(srcdir)/'`src/skip_list.cc
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_minimal_internal_la-skip_list.Tpo $(DEPDIR)/libtcmalloc_minimal_internal_la-skip_list.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/skip_list.cc' object='libtcmalloc_minimal_internal_la-skip_list.lo' libtool=yes @AMDEPBACKSLASH@
+libtcmalloc_minimal_internal_la-skiplist.lo: src/skiplist.cc
+@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_minimal_internal_la-skiplist.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_minimal_internal_la-skiplist.Tpo -c -o libtcmalloc_minimal_internal_la-skiplist.lo `test -f 'src/skiplist.cc' || echo '$(srcdir)/'`src/skiplist.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_minimal_internal_la-skiplist.Tpo $(DEPDIR)/libtcmalloc_minimal_internal_la-skiplist.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/skiplist.cc' object='libtcmalloc_minimal_internal_la-skiplist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_minimal_internal_la-skip_list.lo `test -f 'src/skip_list.cc' || echo '$(srcdir)/'`src/skip_list.cc
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_minimal_internal_la-skiplist.lo `test -f 'src/skiplist.cc' || echo '$(srcdir)/'`src/skiplist.cc
 
 libtcmalloc_minimal_internal_la-span.lo: src/span.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_minimal_internal_la-span.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_minimal_internal_la-span.Tpo -c -o libtcmalloc_minimal_internal_la-span.lo `test -f 'src/span.cc' || echo '$(srcdir)/'`src/span.cc
@@ -4505,19 +4502,19 @@ simple_compat_test.obj: src/tests/simple_compat_test.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o simple_compat_test.obj `if test -f 'src/tests/simple_compat_test.cc'; then $(CYGPATH_W) 'src/tests/simple_compat_test.cc'; else $(CYGPATH_W) '$(srcdir)/src/tests/simple_compat_test.cc'; fi`
 
-skip_list_unittest.o: src/tests/skip_list_unittest.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT skip_list_unittest.o -MD -MP -MF $(DEPDIR)/skip_list_unittest.Tpo -c -o skip_list_unittest.o `test -f 'src/tests/skip_list_unittest.cc' || echo '$(srcdir)/'`src/tests/skip_list_unittest.cc
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/skip_list_unittest.Tpo $(DEPDIR)/skip_list_unittest.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/tests/skip_list_unittest.cc' object='skip_list_unittest.o' libtool=no @AMDEPBACKSLASH@
+skiplist_unittest.o: src/tests/skiplist_unittest.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT skiplist_unittest.o -MD -MP -MF $(DEPDIR)/skiplist_unittest.Tpo -c -o skiplist_unittest.o `test -f 'src/tests/skiplist_unittest.cc' || echo '$(srcdir)/'`src/tests/skiplist_unittest.cc
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/skiplist_unittest.Tpo $(DEPDIR)/skiplist_unittest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/tests/skiplist_unittest.cc' object='skiplist_unittest.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o skip_list_unittest.o `test -f 'src/tests/skip_list_unittest.cc' || echo '$(srcdir)/'`src/tests/skip_list_unittest.cc
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o skiplist_unittest.o `test -f 'src/tests/skiplist_unittest.cc' || echo '$(srcdir)/'`src/tests/skiplist_unittest.cc
 
-skip_list_unittest.obj: src/tests/skip_list_unittest.cc
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT skip_list_unittest.obj -MD -MP -MF $(DEPDIR)/skip_list_unittest.Tpo -c -o skip_list_unittest.obj `if test -f 'src/tests/skip_list_unittest.cc'; then $(CYGPATH_W) 'src/tests/skip_list_unittest.cc'; else $(CYGPATH_W) '$(srcdir)/src/tests/skip_list_unittest.cc'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/skip_list_unittest.Tpo $(DEPDIR)/skip_list_unittest.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/tests/skip_list_unittest.cc' object='skip_list_unittest.obj' libtool=no @AMDEPBACKSLASH@
+skiplist_unittest.obj: src/tests/skiplist_unittest.cc
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT skiplist_unittest.obj -MD -MP -MF $(DEPDIR)/skiplist_unittest.Tpo -c -o skiplist_unittest.obj `if test -f 'src/tests/skiplist_unittest.cc'; then $(CYGPATH_W) 'src/tests/skiplist_unittest.cc'; else $(CYGPATH_W) '$(srcdir)/src/tests/skiplist_unittest.cc'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/skiplist_unittest.Tpo $(DEPDIR)/skiplist_unittest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/tests/skiplist_unittest.cc' object='skiplist_unittest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o skip_list_unittest.obj `if test -f 'src/tests/skip_list_unittest.cc'; then $(CYGPATH_W) 'src/tests/skip_list_unittest.cc'; else $(CYGPATH_W) '$(srcdir)/src/tests/skip_list_unittest.cc'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o skiplist_unittest.obj `if test -f 'src/tests/skiplist_unittest.cc'; then $(CYGPATH_W) 'src/tests/skiplist_unittest.cc'; else $(CYGPATH_W) '$(srcdir)/src/tests/skiplist_unittest.cc'; fi`
 
 stack_trace_table_test-stack_trace_table_test.o: src/tests/stack_trace_table_test.cc
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(stack_trace_table_test_CXXFLAGS) $(CXXFLAGS) -MT stack_trace_table_test-stack_trace_table_test.o -MD -MP -MF $(DEPDIR)/stack_trace_table_test-stack_trace_table_test.Tpo -c -o stack_trace_table_test-stack_trace_table_test.o `test -f 'src/tests/stack_trace_table_test.cc' || echo '$(srcdir)/'`src/tests/stack_trace_table_test.cc

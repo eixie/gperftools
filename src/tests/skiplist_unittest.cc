@@ -34,18 +34,17 @@
 #include <stdio.h>
 #include "common.h"
 #include "base/logging.h"
-#include "src/skip_list.h"
+#include "src/skiplist.h"
 #include "src/span.h"
 #include "src/static_vars.h"
 
 using tcmalloc::Span;
 using tcmalloc::Static;
-using tcmalloc::SkipList;
-using tcmalloc::SkipList;
+using tcmalloc::Skiplist;
 
 namespace {
 
-static void TestSkipList() {
+static void TestSkiplist() {
   Span* span = Static::span_allocator()->New();
   Span* span2 = Static::span_allocator()->New();
   Span* span3 = Static::span_allocator()->New();
@@ -59,7 +58,7 @@ static void TestSkipList() {
   span3->length = 5;
   span3->start = 15;
 
-  SkipList list;
+  Skiplist list;
   list.Init();
   list.Insert(span3);
   list.Insert(span2);
@@ -120,7 +119,7 @@ static void TestSpanCompare() {
 
 int main(int argc, char** argv) {
   TestSpanCompare();
-  TestSkipList();
+  TestSkiplist();
 
   printf("PASS\n");
   return 0;

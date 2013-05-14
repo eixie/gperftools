@@ -32,32 +32,32 @@
 
 #include <config.h>
 #include "common.h"
-#include "skip_list.h"
+#include "skiplist.h"
 #include "span.h"
 #include "static_vars.h"
 #include <sys/resource.h>
 
 namespace tcmalloc {
 
-SkipListNode* SkipList::NewNode(Span* value) {
-  SkipListNode* result = Static::skip_list_node_allocator()->New();
+SkiplistNode* Skiplist::NewNode(Span* value) {
+  SkiplistNode* result = Static::skiplist_node_allocator()->New();
   memset(result, 0, sizeof(*result));
   result->value = value;
   return result;
 }
 
-void SkipList::DeleteNode(SkipListNode* node) {
-  Static::skip_list_node_allocator()->Delete(node);
+void Skiplist::DeleteNode(SkiplistNode* node) {
+  Static::skiplist_node_allocator()->Delete(node);
 }
 
-void SkipList::Init() {
+void Skiplist::Init() {
   level_ = 0;
   head_ = NewNode(NULL);
 }
 
-void SkipList::Insert(Span* span) {
-  SkipListNode* update[kSkipListHeight];
-  SkipListNode* x = head_;
+void Skiplist::Insert(Span* span) {
+  SkiplistNode* update[kSkiplistHeight];
+  SkiplistNode* x = head_;
 
   for (int i = level_; i >= 0; i--) {
     while(x->forward[i] && SpanCompare(x->forward[i]->value, span) == -1) {
@@ -68,7 +68,7 @@ void SkipList::Insert(Span* span) {
 
   unsigned int lvl = random_level();
   if (lvl > level_) {
-    if (level_ == kSkipListHeight - 1) {
+    if (level_ == kSkiplistHeight - 1) {
       lvl = level_;
     } else {
       // increase the level of the list by a maximum of 1 as per the paper
@@ -92,9 +92,9 @@ void SkipList::Insert(Span* span) {
   }
 }
 
-void SkipList::Remove(Span* span) {
+void Skiplist::Remove(Span* span) {
   if (span->skiplist_node_ptr) {
-    SkipListNode* x = span->skiplist_node_ptr;
+    SkiplistNode* x = span->skiplist_node_ptr;
     
     for(int i = 0; i <= level_ && x->backward[i]; i++) {
       ASSERT(x->backward[i]->forward[i] == x);
@@ -115,8 +115,8 @@ void SkipList::Remove(Span* span) {
   }
 }
 
-Span* SkipList::GetBestFit(size_t pages) {
-  SkipListNode* x = head_;
+Span* Skiplist::GetBestFit(size_t pages) {
+  SkiplistNode* x = head_;
 
   for (int i = level_; i >= 0; i--) {
     while(x->forward[i] &&
@@ -138,8 +138,8 @@ Span* SkipList::GetBestFit(size_t pages) {
   return NULL;
 }
 
-bool SkipList::Includes(Span* span) {
-  SkipListNode* x = head_;
+bool Skiplist::Includes(Span* span) {
+  SkiplistNode* x = head_;
   while(x->forward[0] != NULL) {
     if (x->forward[0]->value == span) {
       return true;
@@ -150,11 +150,11 @@ bool SkipList::Includes(Span* span) {
   return false;
 }
 
-void SkipList::Print() {
+void Skiplist::Print() {
   fprintf(stderr, "printing skip list of level: %d\n", level_);
   for(int i = level_; i >= 0; i--) {
     fprintf(stderr, "level %d: [", i);
-    SkipListNode* x = head_;
+    SkiplistNode* x = head_;
     while(x->forward[i] != NULL) {
       fprintf(stderr, "[%lu,%u,%p]", x->forward[i]->value->length,
                                   (unsigned int)x->forward[i]->value->start,

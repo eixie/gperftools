@@ -43,7 +43,7 @@
 #include "common.h"
 #include "packed-cache-inl.h"
 #include "pagemap.h"
-#include "skip_list.h"
+#include "skiplist.h"
 #include "span.h"
 
 // We need to dllexport PageHeap just for the unittest.  MSVC complains
@@ -216,7 +216,7 @@ class PERFTOOLS_DLL_DECL PageHeap {
   // At what large_lists_size_ does it become worthwhile to maintain
   // the skiplist for satisfying large allocations?
   // TODO: Make tunable with ENV vars?
-  static const int kLargeSkipListThreshold = 250;
+  static const int kLargeSkiplistThreshold = 250;
 
   // Pick the appropriate map and cache types based on pointer size
   typedef MapSelector<kAddressBits>::Type PageMap;
@@ -246,7 +246,7 @@ class PERFTOOLS_DLL_DECL PageHeap {
 
   // Skip list of large spans for efficiently finding a best-fit
   // span for large allocs
-  SkipList large_skiplist_;
+  Skiplist large_skiplist_;
 
   // Statistics on system, free, and unmapped bytes
   Stats stats_;
@@ -301,7 +301,7 @@ class PERFTOOLS_DLL_DECL PageHeap {
   int release_index_;
 
   // Initially populate the large skiplist. Used every time
-  // we cross the kLargeSkipListThreshold.
+  // we cross the kLargeSkiplistThreshold.
   void InitializeLargeSkiplist();
 };
 

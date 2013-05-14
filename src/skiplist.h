@@ -41,16 +41,16 @@
 namespace tcmalloc {
 
 // This can't be greater than 2 ^ 4 without changing the type of
-// SkipList::level_
-static const unsigned int kSkipListHeight = 10;
+// Skiplist::level_
+static const unsigned int kSkiplistHeight = 10;
 
-struct SkipListNode {
-  SkipListNode* forward[kSkipListHeight];
-  SkipListNode* backward[kSkipListHeight];
+struct SkiplistNode {
+  SkiplistNode* forward[kSkiplistHeight];
+  SkiplistNode* backward[kSkiplistHeight];
   Span* value;
 };
 
-class SkipList {
+class Skiplist {
   public:
    void Init();
    void Insert(Span* span);
@@ -62,10 +62,10 @@ class SkipList {
 
   private:
    unsigned int level_ : 4;
-   SkipListNode* head_;
+   SkiplistNode* head_;
 
-   SkipListNode* NewNode(Span* value);
-   void DeleteNode(SkipListNode* node);
+   SkiplistNode* NewNode(Span* value);
+   void DeleteNode(SkiplistNode* node);
 
    // Straight jacked from src/base/low_level_alloc.cc
    inline unsigned int random_level() {
