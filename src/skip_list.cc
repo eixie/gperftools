@@ -52,7 +52,6 @@ void SkipList::DeleteNode(Node* node) {
 
 void SkipList::Init() {
   level_ = 0;
-  remove_time_ = 0;
   head_ = NewNode(NULL);
 }
 
@@ -152,8 +151,7 @@ bool SkipList::Includes(Span* span) {
 }
 
 void SkipList::Print() {
-  fprintf(stderr, "printing skip list of level: %d remove time: %dms\n", level_,
-	      (int)(remove_time_ * 1000));
+  fprintf(stderr, "printing skip list of level: %d\n", level_);
   for(int i = level_; i >= 0; i--) {
     fprintf(stderr, "level %d: [", i);
     Node* x = head_;
