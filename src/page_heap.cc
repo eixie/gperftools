@@ -61,6 +61,7 @@ PageHeap::PageHeap()
       // Start scavenging at kMaxPages list
       release_index_(kMaxPages),
       large_lists_size_(0),
+      using_large_skiplist_(false),
       largealloc_cbuf_index(0) {
   COMPILE_ASSERT(kNumClasses <= (1 << PageMapCache::kValuebits), valuebits);
   DLL_Init(&large_.normal);
