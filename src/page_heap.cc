@@ -257,7 +257,9 @@ void PageHeap::PrependToFreeList(Span* span) {
     large_lists_size_++;
     if (large_lists_size_ == kLargeSkipListThreshold && !using_large_skiplist_) {
       InitializeLargeSkiplist();
-    } else if (using_large_skiplist_) {
+    }
+
+    if (using_large_skiplist_) {
       large_skiplist_.Insert(span);
     }
   }
