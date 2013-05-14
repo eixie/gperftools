@@ -586,10 +586,9 @@ libtcmalloc_debug_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 am__libtcmalloc_internal_la_SOURCES_DIST = src/common.cc \
 	src/internal_logging.cc src/system-alloc.cc \
 	src/memfs_malloc.cc src/central_freelist.cc src/page_heap.cc \
-	src/page_heap_instrumentation.cc src/sampler.cc \
-	src/skip_list.cc src/span.cc src/stack_trace_table.cc \
-	src/static_vars.cc src/symbolize.cc src/thread_cache.cc \
-	src/malloc_hook.cc src/malloc_extension.cc \
+	src/sampler.cc src/skip_list.cc src/span.cc \
+	src/stack_trace_table.cc src/static_vars.cc src/symbolize.cc \
+	src/thread_cache.cc src/malloc_hook.cc src/malloc_extension.cc \
 	src/maybe_threads.cc src/common.h src/internal_logging.h \
 	src/system-alloc.h src/packed-cache-inl.h src/base/spinlock.h \
 	src/base/spinlock_internal.h src/base/atomicops.h \
@@ -634,7 +633,6 @@ am__objects_21 = libtcmalloc_internal_la-common.lo \
 	libtcmalloc_internal_la-memfs_malloc.lo \
 	libtcmalloc_internal_la-central_freelist.lo \
 	libtcmalloc_internal_la-page_heap.lo \
-	libtcmalloc_internal_la-page_heap_instrumentation.lo \
 	libtcmalloc_internal_la-sampler.lo \
 	libtcmalloc_internal_la-skip_list.lo \
 	libtcmalloc_internal_la-span.lo \
@@ -743,10 +741,9 @@ libtcmalloc_minimal_internal_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 am__libtcmalloc_minimal_internal_la_SOURCES_DIST = src/common.cc \
 	src/internal_logging.cc src/system-alloc.cc \
 	src/memfs_malloc.cc src/central_freelist.cc src/page_heap.cc \
-	src/page_heap_instrumentation.cc src/sampler.cc \
-	src/skip_list.cc src/span.cc src/stack_trace_table.cc \
-	src/static_vars.cc src/symbolize.cc src/thread_cache.cc \
-	src/malloc_hook.cc src/malloc_extension.cc \
+	src/sampler.cc src/skip_list.cc src/span.cc \
+	src/stack_trace_table.cc src/static_vars.cc src/symbolize.cc \
+	src/thread_cache.cc src/malloc_hook.cc src/malloc_extension.cc \
 	src/maybe_threads.cc src/common.h src/internal_logging.h \
 	src/system-alloc.h src/packed-cache-inl.h src/base/spinlock.h \
 	src/base/spinlock_internal.h src/base/atomicops.h \
@@ -784,7 +781,6 @@ am_libtcmalloc_minimal_internal_la_OBJECTS =  \
 	libtcmalloc_minimal_internal_la-memfs_malloc.lo \
 	libtcmalloc_minimal_internal_la-central_freelist.lo \
 	libtcmalloc_minimal_internal_la-page_heap.lo \
-	libtcmalloc_minimal_internal_la-page_heap_instrumentation.lo \
 	libtcmalloc_minimal_internal_la-sampler.lo \
 	libtcmalloc_minimal_internal_la-skip_list.lo \
 	libtcmalloc_minimal_internal_la-span.lo \
@@ -2263,7 +2259,6 @@ libtcmalloc_minimal_internal_la_SOURCES = src/common.cc \
                                           src/memfs_malloc.cc \
                                           src/central_freelist.cc \
                                           src/page_heap.cc \
-                                          src/page_heap_instrumentation.cc \
                                           src/sampler.cc \
                                           src/skip_list.cc \
                                           src/span.cc \
@@ -3189,7 +3184,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-memfs_malloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-memory_region_map.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-page_heap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-page_heap_instrumentation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-raw_printer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-sampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_internal_la-skip_list.Plo@am__quote@
@@ -3212,7 +3206,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-maybe_threads.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-memfs_malloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-page_heap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-page_heap_instrumentation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-sampler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-skip_list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libtcmalloc_minimal_internal_la-span.Plo@am__quote@
@@ -3588,13 +3581,6 @@ libtcmalloc_internal_la-page_heap.lo: src/page_heap.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_internal_la-page_heap.lo `test -f 'src/page_heap.cc' || echo '$(srcdir)/'`src/page_heap.cc
 
-libtcmalloc_internal_la-page_heap_instrumentation.lo: src/page_heap_instrumentation.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_internal_la-page_heap_instrumentation.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_internal_la-page_heap_instrumentation.Tpo -c -o libtcmalloc_internal_la-page_heap_instrumentation.lo `test -f 'src/page_heap_instrumentation.cc' || echo '$(srcdir)/'`src/page_heap_instrumentation.cc
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_internal_la-page_heap_instrumentation.Tpo $(DEPDIR)/libtcmalloc_internal_la-page_heap_instrumentation.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/page_heap_instrumentation.cc' object='libtcmalloc_internal_la-page_heap_instrumentation.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_internal_la-page_heap_instrumentation.lo `test -f 'src/page_heap_instrumentation.cc' || echo '$(srcdir)/'`src/page_heap_instrumentation.cc
-
 libtcmalloc_internal_la-sampler.lo: src/sampler.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_internal_la-sampler.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_internal_la-sampler.Tpo -c -o libtcmalloc_internal_la-sampler.lo `test -f 'src/sampler.cc' || echo '$(srcdir)/'`src/sampler.cc
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_internal_la-sampler.Tpo $(DEPDIR)/libtcmalloc_internal_la-sampler.Plo
@@ -3755,13 +3741,6 @@ libtcmalloc_minimal_internal_la-page_heap.lo: src/page_heap.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/page_heap.cc' object='libtcmalloc_minimal_internal_la-page_heap.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_minimal_internal_la-page_heap.lo `test -f 'src/page_heap.cc' || echo '$(srcdir)/'`src/page_heap.cc
-
-libtcmalloc_minimal_internal_la-page_heap_instrumentation.lo: src/page_heap_instrumentation.cc
-@am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_minimal_internal_la-page_heap_instrumentation.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_minimal_internal_la-page_heap_instrumentation.Tpo -c -o libtcmalloc_minimal_internal_la-page_heap_instrumentation.lo `test -f 'src/page_heap_instrumentation.cc' || echo '$(srcdir)/'`src/page_heap_instrumentation.cc
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/libtcmalloc_minimal_internal_la-page_heap_instrumentation.Tpo $(DEPDIR)/libtcmalloc_minimal_internal_la-page_heap_instrumentation.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/page_heap_instrumentation.cc' object='libtcmalloc_minimal_internal_la-page_heap_instrumentation.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -c -o libtcmalloc_minimal_internal_la-page_heap_instrumentation.lo `test -f 'src/page_heap_instrumentation.cc' || echo '$(srcdir)/'`src/page_heap_instrumentation.cc
 
 libtcmalloc_minimal_internal_la-sampler.lo: src/sampler.cc
 @am__fastdepCXX_TRUE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libtcmalloc_minimal_internal_la_CXXFLAGS) $(CXXFLAGS) -MT libtcmalloc_minimal_internal_la-sampler.lo -MD -MP -MF $(DEPDIR)/libtcmalloc_minimal_internal_la-sampler.Tpo -c -o libtcmalloc_minimal_internal_la-sampler.lo `test -f 'src/sampler.cc' || echo '$(srcdir)/'`src/sampler.cc

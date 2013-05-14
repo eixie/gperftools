@@ -58,11 +58,10 @@ PageHeap::PageHeap()
     : pagemap_(MetaDataAlloc),
       pagemap_cache_(0),
       scavenge_counter_(0),
+      large_lists_size_(0),
       // Start scavenging at kMaxPages list
       release_index_(kMaxPages),
-      large_lists_size_(0),
-      using_large_skiplist_(false),
-      largealloc_cbuf_index(0) {
+      using_large_skiplist_(false) {
   COMPILE_ASSERT(kNumClasses <= (1 << PageMapCache::kValuebits), valuebits);
   DLL_Init(&large_.normal);
   DLL_Init(&large_.returned);
@@ -148,50 +147,7 @@ Span* PageHeap::AllocLarge(Length n) {
     best = large_skiplist_.GetBestFit(n);
   }
 
-  largealloc_cbuf[largealloc_cbuf_index].length = n;
-  largealloc_cbuf[largealloc_cbuf_index].satisfied_by = best ? best->length : 0;
-  largealloc_cbuf_index++;
-  if (largealloc_cbuf_index == 100) { largealloc_cbuf_index = 0; }
-
   return best == NULL ? NULL : Carve(best, n);
-}
-
-void PageHeap::PrintLargeAllocStats() {
-  fprintf(stderr, "[tcmalloc] %u Printing large allocation stats (in # of %lu byte pages).\n", time(NULL), kPageSize);
-  fprintf(stderr, "\tLast %d allocations: [", largealloc_cbuf_size);
-
-  for(int i = 0; i < largealloc_cbuf_size; i++) {
-    struct largealloc alloc = largealloc_cbuf[i];
-
-    fprintf(stderr, "%lu/", alloc.length);
-    if (alloc.satisfied_by) {
-      fprintf(stderr, "satisfied by %lu", alloc.satisfied_by);
-    } else {
-      fprintf(stderr, "unsatisfied");
-    }
-
-    if (i < (largealloc_cbuf_size - 1)) { fprintf(stderr, ", "); }
-  }
-
-  fprintf(stderr, "]\n");
-
-  fprintf(stderr, "\tFree list contents: [");
-  for (Span* span = large_.normal.next;
-       span != &large_.normal;
-       span = span->next) {
-    fprintf(stderr, "%lu", span->length);
-    if (span->next != &large_.normal) { fprintf(stderr, ", "); }
-  }
-  fprintf(stderr, "]\n");
-
-  fprintf(stderr, "\tReturned list contents: [");
-  for (Span* span = large_.returned.next;
-       span != &large_.returned;
-       span = span->next) {
-    fprintf(stderr, "%lu", span->length);
-    if (span->next != &large_.returned) { fprintf(stderr, ", "); }
-  }
-  fprintf(stderr, "]\n");
 }
 
 Span* PageHeap::Split(Span* span, Length n) {

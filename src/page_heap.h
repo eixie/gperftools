@@ -190,8 +190,6 @@ class PERFTOOLS_DLL_DECL PageHeap {
   }
   void CacheSizeClass(PageID p, size_t cl) const { pagemap_cache_.Put(p, cl); }
 
-  void PrintLargeAllocStats();
-
  private:
   // Allocates a big block of memory for the pagemap once we reach more than
   // 128MB
@@ -301,14 +299,6 @@ class PERFTOOLS_DLL_DECL PageHeap {
 
   // Index of last free list where we released memory to the OS.
   int release_index_;
-
-  struct largealloc {
-    Length length;
-    Length satisfied_by;
-  };
-  static const int largealloc_cbuf_size = 100;
-  struct largealloc largealloc_cbuf[largealloc_cbuf_size];
-  unsigned int largealloc_cbuf_index;
 
   // Initially populate the large skiplist. Used every time
   // we cross the kLargeSkipListThreshold.
