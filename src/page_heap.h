@@ -215,6 +215,11 @@ class PERFTOOLS_DLL_DECL PageHeap {
   // scavenging again.  With 4K pages, this comes to 1GB of memory.
   static const int kDefaultReleaseDelay = 1 << 18;
 
+  // At what large_lists_size_ does it become worthwhile to maintain
+  // the skiplist for satisfying large allocations?
+  // TODO: Make tunable with ENV vars?
+  static const int kLargeSkipListThreshold = 250;
+
   // Pick the appropriate map and cache types based on pointer size
   typedef MapSelector<kAddressBits>::Type PageMap;
   typedef MapSelector<kAddressBits>::CacheType PageMapCache;
@@ -234,6 +239,12 @@ class PERFTOOLS_DLL_DECL PageHeap {
 
   // Array mapping from span length to a doubly linked list of free spans
   SpanList free_[kMaxPages];
+
+  // Combined number of elements in large normal and returned lists
+  size_t large_lists_size_;
+
+  // Have we switched over to using the large skiplist?
+  bool using_large_skiplist_;
 
   // Skip list of large spans for efficiently finding a best-fit
   // span for large allocs
@@ -298,6 +309,10 @@ class PERFTOOLS_DLL_DECL PageHeap {
   static const int largealloc_cbuf_size = 100;
   struct largealloc largealloc_cbuf[largealloc_cbuf_size];
   unsigned int largealloc_cbuf_index;
+
+  // Initially populate the large skiplist. Used every time
+  // we cross the kLargeSkipListThreshold.
+  void InitializeLargeSkiplist();
 };
 
 }  // namespace tcmalloc
