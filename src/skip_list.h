@@ -42,6 +42,8 @@ namespace tcmalloc {
 
 class SkipList {
   public:
+   // This can't be greater than 2 ^ 4 without changing the type of
+   // level_
    static const unsigned int kSkipListHeight = 10;
 
    void Init();
