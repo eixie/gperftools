@@ -101,7 +101,7 @@ void SkipList::Remove(Span* span) {
       x->backward[i]->forward[i] = x->forward[i];
       ASSERT(!x->forward[i] || x->forward[i]->backward[i] == x);
       if (x->forward[i])
-	x->forward[i]->backward[i] = x->backward[i];
+        x->forward[i]->backward[i] = x->backward[i];
       ASSERT(x->backward[i] != x->forward[i]);
     }
 
@@ -129,8 +129,8 @@ Span* SkipList::GetBestFit(size_t pages) {
       Span* rv = x->value;
 
       if (rv && rv->length >= pages) {
-	Remove(rv);
-	return rv;
+        Remove(rv);
+        return rv;
       }
     }
   }
