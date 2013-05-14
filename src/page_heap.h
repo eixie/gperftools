@@ -248,7 +248,7 @@ class PERFTOOLS_DLL_DECL PageHeap {
 
   // Skip list of large spans for efficiently finding a best-fit
   // span for large allocs
-  SkipList ordered_large_;
+  SkipList large_skiplist_;
 
   // Statistics on system, free, and unmapped bytes
   Stats stats_;

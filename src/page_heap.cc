@@ -145,7 +145,7 @@ Span* PageHeap::AllocLarge(Length n) {
       }
     }
   } else {
-    best = ordered_large_.GetBestFit(n);
+    best = large_skiplist_.GetBestFit(n);
   }
 
   largealloc_cbuf[largealloc_cbuf_index].length = n;
@@ -305,7 +305,7 @@ void PageHeap::PrependToFreeList(Span* span) {
     if (large_lists_size_ == kLargeSkipListThreshold && !using_large_skiplist_) {
       InitializeLargeSkiplist();
     } else if (using_large_skiplist_) {
-      ordered_large_.Insert(span);
+      large_skiplist_.Insert(span);
     }
   }
 
@@ -328,7 +328,7 @@ void PageHeap::RemoveFromFreeList(Span* span) {
 
   if (span->length > kMaxPages) {
     if (using_large_skiplist_) {
-      ordered_large_.Remove(span);
+      large_skiplist_.Remove(span);
     }
 
     large_lists_size_--;
@@ -561,18 +561,18 @@ void PageHeap::InitializeLargeSkiplist() {
   fprintf(stderr, "tcmalloc: skiplist threshold reached\n");
 
   using_large_skiplist_ = true;
-  ordered_large_.Init();
+  large_skiplist_.Init();
 
   for (Span* span = large_.normal.next;
       span != &large_.normal;
       span = span->next) {
-    ordered_large_.Insert(span);
+    large_skiplist_.Insert(span);
   }
 
   for (Span* span = large_.returned.next;
       span != &large_.returned;
       span = span->next) {
-    ordered_large_.Insert(span);
+    large_skiplist_.Insert(span);
   }
 }
 
