@@ -70,7 +70,7 @@ class Static {
 
   static PageHeapAllocator<Span>* span_allocator() { return &span_allocator_; }
 
-  static PageHeapAllocator<SkipList::Node>* skip_list_node_allocator() {
+  static PageHeapAllocator<SkipListNode>* skip_list_node_allocator() {
     return &skip_list_node_allocator_;
   }
 
@@ -98,7 +98,7 @@ class Static {
   static SizeMap sizemap_;
   static CentralFreeListPadded central_cache_[kNumClasses];
   static PageHeapAllocator<Span> span_allocator_;
-  static PageHeapAllocator<SkipList::Node> skip_list_node_allocator_;
+  static PageHeapAllocator<SkipListNode> skip_list_node_allocator_;
   static PageHeapAllocator<StackTrace> stacktrace_allocator_;
   static Span sampled_objects_;
   static PageHeapAllocator<StackTraceTable::Bucket> bucket_allocator_;

@@ -39,14 +39,14 @@
 
 namespace tcmalloc {
 
-SkipList::Node* SkipList::NewNode(Span* value) {
-  Node* result = Static::skip_list_node_allocator()->New();
+SkipListNode* SkipList::NewNode(Span* value) {
+  SkipListNode* result = Static::skip_list_node_allocator()->New();
   memset(result, 0, sizeof(*result));
   result->value = value;
   return result;
 }
 
-void SkipList::DeleteNode(Node* node) {
+void SkipList::DeleteNode(SkipListNode* node) {
   Static::skip_list_node_allocator()->Delete(node);
 }
 
@@ -56,8 +56,8 @@ void SkipList::Init() {
 }
 
 void SkipList::Insert(Span* span) {
-  Node* update[kSkipListHeight];
-  Node* x = head_;
+  SkipListNode* update[kSkipListHeight];
+  SkipListNode* x = head_;
 
   for (int i = level_; i >= 0; i--) {
     while(x->forward[i] && SpanCompare(x->forward[i]->value, span) == -1) {
@@ -79,7 +79,7 @@ void SkipList::Insert(Span* span) {
   }
 
   x = NewNode(span);
-  span->ordered_free_list_ptr = (void*)x;
+  span->skiplist_node_ptr = x;
   for(int i = 0; i <= lvl; i++) {
     ASSERT(update[i] != x);
 
@@ -93,8 +93,8 @@ void SkipList::Insert(Span* span) {
 }
 
 void SkipList::Remove(Span* span) {
-  if (span->ordered_free_list_ptr) {
-    Node* x = (Node*)span->ordered_free_list_ptr;
+  if (span->skiplist_node_ptr) {
+    SkipListNode* x = span->skiplist_node_ptr;
     
     for(int i = 0; i <= level_ && x->backward[i]; i++) {
       ASSERT(x->backward[i]->forward[i] == x);
@@ -111,12 +111,12 @@ void SkipList::Remove(Span* span) {
       level_--;
     }
 
-    span->ordered_free_list_ptr = NULL;
+    span->skiplist_node_ptr = NULL;
   }
 }
 
 Span* SkipList::GetBestFit(size_t pages) {
-  Node* x = head_;
+  SkipListNode* x = head_;
 
   for (int i = level_; i >= 0; i--) {
     while(x->forward[i] &&
@@ -139,7 +139,7 @@ Span* SkipList::GetBestFit(size_t pages) {
 }
 
 bool SkipList::Includes(Span* span) {
-  Node* x = head_;
+  SkipListNode* x = head_;
   while(x->forward[0] != NULL) {
     if (x->forward[0]->value == span) {
       return true;
@@ -154,7 +154,7 @@ void SkipList::Print() {
   fprintf(stderr, "printing skip list of level: %d\n", level_);
   for(int i = level_; i >= 0; i--) {
     fprintf(stderr, "level %d: [", i);
-    Node* x = head_;
+    SkipListNode* x = head_;
     while(x->forward[i] != NULL) {
       fprintf(stderr, "[%lu,%u,%p]", x->forward[i]->value->length,
                                   (unsigned int)x->forward[i]->value->start,

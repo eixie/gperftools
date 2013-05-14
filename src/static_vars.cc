@@ -43,7 +43,7 @@ SpinLock Static::pageheap_lock_(SpinLock::LINKER_INITIALIZED);
 SizeMap Static::sizemap_;
 CentralFreeListPadded Static::central_cache_[kNumClasses];
 PageHeapAllocator<Span> Static::span_allocator_;
-PageHeapAllocator<SkipList::Node> Static::skip_list_node_allocator_;
+PageHeapAllocator<SkipListNode> Static::skip_list_node_allocator_;
 PageHeapAllocator<StackTrace> Static::stacktrace_allocator_;
 Span Static::sampled_objects_;
 PageHeapAllocator<StackTraceTable::Bucket> Static::bucket_allocator_;
