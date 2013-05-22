@@ -190,6 +190,10 @@ class PERFTOOLS_DLL_DECL PageHeap {
   }
   void CacheSizeClass(PageID p, size_t cl) const { pagemap_cache_.Put(p, cl); }
 
+  inline void PrintLargeListLength() {
+    fprintf(stderr, "Combined large lists size: %lu\n", large_lists_size_);
+  }
+
  private:
   // Allocates a big block of memory for the pagemap once we reach more than
   // 128MB
