@@ -189,6 +189,10 @@ class PERFTOOLS_DLL_DECL PageHeap {
   }
   void CacheSizeClass(PageID p, size_t cl) const { pagemap_cache_.Put(p, cl); }
 
+  inline void PrintLargeListLength() {
+    fprintf(stderr, "Combined large lists size: %lu\n", large_length_);
+  }
+
  private:
   // Allocates a big block of memory for the pagemap once we reach more than
   // 128MB
@@ -228,6 +232,9 @@ class PERFTOOLS_DLL_DECL PageHeap {
 
   // List of free spans of length >= kMaxPages
   SpanList large_;
+
+  // Length of combined large normal and returned lists
+  size_t large_length_;
 
   // Array mapping from span length to a doubly linked list of free spans
   SpanList free_[kMaxPages];

@@ -63,6 +63,7 @@ namespace tcmalloc {
 PageHeap::PageHeap()
     : pagemap_(MetaDataAlloc),
       pagemap_cache_(0),
+      large_length_(0),
       scavenge_counter_(0),
       // Start scavenging at kMaxPages list
       release_index_(kMaxPages) {
@@ -281,6 +282,7 @@ void PageHeap::MergeIntoFreeList(Span* span) {
 void PageHeap::PrependToFreeList(Span* span) {
   ASSERT(span->location != Span::IN_USE);
   SpanList* list = (span->length < kMaxPages) ? &free_[span->length] : &large_;
+  if (span->length >= kMaxPages) { large_length_++; }
   if (span->location == Span::ON_NORMAL_FREELIST) {
     stats_.free_bytes += (span->length << kPageShift);
     DLL_Prepend(&list->normal, span);
@@ -297,6 +299,7 @@ void PageHeap::RemoveFromFreeList(Span* span) {
   } else {
     stats_.unmapped_bytes -= (span->length << kPageShift);
   }
+  if (span->length >= kMaxPages) { large_length_--; }
   DLL_Remove(span);
 }
 
